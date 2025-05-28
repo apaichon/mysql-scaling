@@ -1,0 +1,129 @@
+version: '3.8'
+
+services:
+  # MySQL with default configuration for baseline testing
+  mysql-default:
+    image: mysql:8.0
+    platform: linux/arm64/v8
+    hostname: mysql-default
+    container_name: mysql-default
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: test_password
+      MYSQL_DATABASE: performance_test
+      MYSQL_USER: test_user
+      MYSQL_PASSWORD: test_password
+    volumes:
+      - ./mysql_default_data:/var/lib/mysql
+      - ./mysql/default.cnf:/etc/mysql/conf.d/default.cnf
+      - ./logs/default:/var/log/mysql
+    networks:
+      - mysql_network
+    deploy:
+      resources:
+        limits:
+          cpus: '8' # Limit to available CPU cores on MacBook Pro
+          memory: 8G # Allocate 8GB for default config
+        reservations:
+          cpus: '4'
+          memory: 4G
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-ptest_password" ]
+      timeout: 20s
+      retries: 5
+      interval: 30s
+    profiles:
+      - default
+
+  # MySQL with optimized configuration for comparison testing
+  mysql-optimized:
+    image: mysql:8.0
+    platform: linux/arm64/v8
+    hostname: mysql-optimized
+    container_name: mysql-optimized
+    ports:
+      - "3307:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: test_password
+      MYSQL_DATABASE: performance_test
+      MYSQL_USER: test_user
+      MYSQL_PASSWORD: test_password
+    volumes:
+      - ./mysql_optimized_data:/var/lib/mysql
+      - ./mysql/optimized.cnf:/etc/mysql/conf.d/optimized.cnf
+      - ./logs/optimized:/var/log/mysql
+    networks:
+      - mysql_network
+    deploy:
+      resources:
+        limits:
+          cpus: '8' # Use available CPU cores
+          memory: 12G # Allocate more memory for optimized config
+        reservations:
+          cpus: '4'
+          memory: 8G
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-ptest_password" ]
+      timeout: 20s
+      retries: 5
+      interval: 30s
+    profiles:
+      - optimized
+
+  # Performance monitoring with Percona Toolkit
+  percona-toolkit:
+    image: mysql:8.0
+    platform: linux/arm64/v8
+    hostname: percona-toolkit
+    container_name: percona-toolkit
+    command: sleep infinity
+    volumes:
+      - ./performance_scripts:/scripts
+      - ./performance_results:/results
+    networks:
+      - mysql_network
+    environment:
+      - MYSQL_HOST_DEFAULT=mysql-default
+      - MYSQL_HOST_OPTIMIZED=mysql-optimized
+      - MYSQL_USER=root
+      - MYSQL_PASSWORD=test_password
+    profiles:
+      - tools
+
+  # Simple web-based MySQL admin tool for monitoring
+  adminer:
+    image: adminer:4.8.1
+    platform: linux/arm64/v8
+    hostname: adminer
+    container_name: mysql-adminer
+    ports:
+      - "8900:8080"
+    environment:
+      ADMINER_DEFAULT_SERVER: mysql-default
+    networks:
+      - mysql_network
+    profiles:
+      - tools
+
+networks:
+  mysql_network:
+    driver: bridge
+    driver_opts:
+      com.docker.network.driver.mtu: 1500
+
+volumes:
+  mysql_default_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./data/mysql_default
+  mysql_optimized_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./data/mysql_optimized

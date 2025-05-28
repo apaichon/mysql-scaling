@@ -1,0 +1,102 @@
+# MySQL Default Configuration 
+# File: mysql/default.cnf
+# Standard MySQL 8.0 defaults (before optimization)
+
+[mysqld]
+# Basic settings
+port = 3306
+datadir = /var/lib/mysql
+socket = /var/run/mysqld/mysqld.sock
+pid-file = /var/run/mysqld/mysqld.pid
+
+# Default storage engine
+default-storage-engine = InnoDB
+
+# Character set
+character-set-server = utf8mb4
+collation-server = utf8mb4_0900_ai_ci
+
+# Connection settings (MySQL defaults)
+max_connections = 151
+max_user_connections = 0
+max_connect_errors = 100
+
+# Thread and cache settings (defaults)
+thread_cache_size = 9
+table_open_cache = 4000
+table_definition_cache = 2000
+
+# Memory settings (MySQL 8.0 defaults)
+# InnoDB Buffer Pool - default is 128M (too small for most workloads)
+innodb_buffer_pool_size = 134217728  # 128MB
+innodb_buffer_pool_instances = 1
+
+# Query cache (disabled by default in MySQL 8.0)
+# query_cache_type = 0
+# query_cache_size = 0
+
+# Temporary tables
+tmp_table_size = 16777216      # 16MB
+max_heap_table_size = 16777216 # 16MB
+
+# Sort and read buffers (defaults)
+sort_buffer_size = 262144      # 256KB
+read_buffer_size = 131072      # 128KB
+read_rnd_buffer_size = 262144  # 256KB
+join_buffer_size = 262144      # 256KB
+
+# InnoDB settings (defaults)
+innodb_flush_log_at_trx_commit = 1  # Full ACID compliance (slower)
+innodb_log_file_size = 50331648     # 48MB
+innodb_log_files_in_group = 2
+innodb_log_buffer_size = 16777216   # 16MB
+innodb_flush_method = fsync         # Default (not optimal for performance)
+innodb_file_per_table = 1
+
+# InnoDB I/O settings (defaults)
+innodb_io_capacity = 200
+innodb_io_capacity_max = 2000
+innodb_read_io_threads = 4
+innodb_write_io_threads = 4
+innodb_thread_concurrency = 0
+
+# Binary logging (default enabled)
+log-bin = binlog
+binlog_format = ROW
+expire_logs_days = 30
+max_binlog_size = 1073741824  # 1GB
+sync_binlog = 1               # Safe but slower
+
+# Slow query log (disabled by default)
+slow_query_log = 0
+long_query_time = 10
+
+# Error log
+log-error = /var/log/mysql/error.log
+
+# General query log (disabled by default)
+general_log = 0
+
+# Network settings
+interactive_timeout = 28800  # 8 hours
+wait_timeout = 28800         # 8 hours
+net_read_timeout = 30
+net_write_timeout = 60
+max_allowed_packet = 67108864  # 64MB
+
+# MyISAM settings (defaults)
+key_buffer_size = 8388608      # 8MB
+myisam_sort_buffer_size = 8388608  # 8MB
+
+# Security settings
+local_infile = 1
+
+[mysqldump]
+quick
+single-transaction
+
+[mysql]
+default-character-set = utf8mb4
+
+[client]
+default-character-set = utf8mb4

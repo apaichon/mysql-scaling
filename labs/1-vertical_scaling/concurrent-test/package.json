@@ -1,0 +1,43 @@
+{
+  "name": "concurrent-test",
+  "version": "1.0.0",
+  "description": "Node.js MySQL Performance Testing Suite for MacBook Pro M1",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "test:default": "node src/index.js --container=mysql-default",
+    "test:optimized": "node src/index.js --container=mysql-optimized",
+    "test:compare": "node src/index.js --compare",
+    "test:concurrent:default": "node src/index.js --container=mysql-default --concurrent --threads=10 --records=1000000",
+    "test:concurrent:optimized": "node src/index.js --container=mysql-optimized --concurrent --threads=10 --records=1000000",
+    "test:stress:default": "node src/index.js --container=mysql-default --stress --threads=10 --records=1000000",
+    "test:stress:optimized": "node src/index.js --container=mysql-optimized --stress --threads=10 --records=1000000"
+  },
+  "keywords": [
+    "mysql",
+    "performance",
+    "testing",
+    "nodejs",
+    "docker",
+    "m1",
+    "macbook"
+  ],
+  "author": "Apaichon Punopas",
+  "license": "MIT",
+  "dependencies": {
+    "mysql2": "^3.6.5",
+    "commander": "^11.1.0",
+    "chalk": "^4.1.2",
+    "cli-progress": "^3.12.0",
+    "table": "^6.8.1",
+    "moment": "^2.29.4",
+    "async": "^3.2.4",
+    "lodash": "^4.17.21"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}
