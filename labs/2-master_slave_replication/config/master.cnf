@@ -1,0 +1,31 @@
+[mysqld]
+# Server identification
+server-id = 1
+
+# Binary logging
+log-bin = mysql-bin
+binlog-format = ROW
+binlog-do-db = testdb
+
+# GTID-based replication (recommended for MySQL 8.0)
+gtid-mode = ON
+enforce-gtid-consistency = ON
+
+# Replication settings
+sync_binlog = 1
+innodb_flush_log_at_trx_commit = 1
+
+# Performance settings
+max_connections = 200
+innodb_buffer_pool_size = 256M
+
+# Character set
+character-set-server = utf8mb4
+collation-server = utf8mb4_unicode_ci
+
+# Logging
+general_log = 1
+general_log_file = /var/lib/mysql/general.log
+slow_query_log = 1
+slow_query_log_file = /var/lib/mysql/slow.log
+long_query_time = 2 

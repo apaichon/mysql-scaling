@@ -136,4 +136,5 @@ dist
 .pnp.*
 
 *_data
+*-data
 *_results

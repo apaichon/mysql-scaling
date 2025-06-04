@@ -1,0 +1,76 @@
+version: '3.8'
+
+services:
+  mysql-master:
+    image: mysql:8.0
+    container_name: mysql-master
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: masterpassword
+      MYSQL_DATABASE: testdb
+      MYSQL_USER: replicator
+      MYSQL_PASSWORD: replicatorpassword
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./mysql-master-data:/var/lib/mysql
+      - ./config/master.cnf:/etc/mysql/conf.d/master.cnf
+      - ./init-scripts:/docker-entrypoint-initdb.d
+    networks:
+      - mysql-replication
+    command: --server-id=1 --log-bin=mysql-bin --binlog-do-db=testdb
+
+  mysql-slave1:
+    image: mysql:8.0
+    container_name: mysql-slave1
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: slavepassword
+      MYSQL_DATABASE: testdb
+    ports:
+      - "3307:3306"
+    volumes:
+      - ./mysql-slave1-data:/var/lib/mysql
+      - ./config/slave.cnf:/etc/mysql/conf.d/slave.cnf
+    networks:
+      - mysql-replication
+    depends_on:
+      - mysql-master
+    command: --server-id=2 --relay-log=mysql-relay-bin --log-slave-updates=1 --read-only=1
+
+  mysql-slave2:
+    image: mysql:8.0
+    container_name: mysql-slave2
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: slavepassword
+      MYSQL_DATABASE: testdb
+    ports:
+      - "3308:3306"
+    volumes:
+      - ./mysql-slave2-data:/var/lib/mysql
+      - ./config/slave.cnf:/etc/mysql/conf.d/slave.cnf
+    networks:
+      - mysql-replication
+    depends_on:
+      - mysql-master
+    command: --server-id=3 --relay-log=mysql-relay-bin --log-slave-updates=1 --read-only=1
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: phpmyadmin
+    restart: unless-stopped
+    environment:
+      PMA_ARBITRARY: 1
+      PMA_HOST: mysql-master
+      PMA_PORT: 3306
+    ports:
+      - "8888:80"
+    networks:
+      - mysql-replication
+    depends_on:
+      - mysql-master
+
+networks:
+  mysql-replication:
+    driver: bridge

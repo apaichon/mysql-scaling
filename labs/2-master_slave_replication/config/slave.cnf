@@ -1,0 +1,38 @@
+[mysqld]
+# Server identification (will be overridden by command line)
+server-id = 2
+
+# Relay logging
+relay-log = mysql-relay-bin
+log-slave-updates = 1
+
+# Read-only mode for slaves
+read-only = 1
+super-read-only = 1
+
+# GTID-based replication
+gtid-mode = ON
+enforce-gtid-consistency = ON
+
+# Replication settings
+relay_log_recovery = 1
+slave_parallel_workers = 4
+slave_parallel_type = LOGICAL_CLOCK
+
+# Performance settings
+max_connections = 200
+innodb_buffer_pool_size = 256M
+
+# Character set
+character-set-server = utf8mb4
+collation-server = utf8mb4_unicode_ci
+
+# Logging
+general_log = 1
+general_log_file = /var/lib/mysql/general.log
+slow_query_log = 1
+slow_query_log_file = /var/lib/mysql/slow.log
+long_query_time = 2
+
+# Skip certain errors that might occur during replication
+slave-skip-errors = 1062,1053 

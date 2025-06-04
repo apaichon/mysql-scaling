@@ -1,0 +1,43 @@
+[mysqld]
+# Basic MySQL settings
+pid-file=/var/run/mysqld/mysqld.pid
+socket=/var/run/mysqld/mysqld.sock
+datadir=/var/lib/mysql
+bind-address=0.0.0.0
+
+# Server ID (unique for each node)
+server-id=1
+
+# Binary log settings
+log-bin=mysql-bin
+binlog_format=ROW
+binlog_checksum=NONE
+sync_binlog=1
+
+# GTID settings
+gtid_mode=ON
+enforce_gtid_consistency=ON
+
+# Group Replication settings
+transaction_write_set_extraction=XXHASH64
+group_replication_group_name="aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee"
+group_replication_start_on_boot=ON
+group_replication_local_address="mysql-node1:33061"
+group_replication_group_seeds="mysql-node1:33061,mysql-node2:33061,mysql-node3:33061"
+group_replication_bootstrap_group=ON
+
+# InnoDB settings
+innodb_flush_log_at_trx_commit=1
+innodb_flush_method=O_DIRECT
+innodb_buffer_pool_size=256M
+
+# Connection settings
+max_connections=200
+max_allowed_packet=64M
+
+# Character set
+character-set-server=utf8mb4
+collation-server=utf8mb4_unicode_ci
+
+[client]
+default-character-set=utf8mb4 

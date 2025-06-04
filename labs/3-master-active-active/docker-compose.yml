@@ -1,0 +1,119 @@
+version: '3.8'
+
+services:
+  galera-node1:
+    image: mariadb:10.11
+    container_name: galera-node1
+    hostname: galera-node1
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: testdb
+      MYSQL_USER: testuser
+      MYSQL_PASSWORD: testpass
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./mysql1_data:/var/lib/mysql
+      - ./config/galera.cnf:/etc/mysql/conf.d/galera.cnf
+      - ./init-scripts:/docker-entrypoint-initdb.d
+    networks:
+      mysql_cluster:
+        ipv4_address: 172.30.0.10
+    restart: unless-stopped
+    command: --wsrep-new-cluster
+
+  galera-node2:
+    image: mariadb:10.11
+    container_name: galera-node2
+    hostname: galera-node2
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: testdb
+      MYSQL_USER: testuser
+      MYSQL_PASSWORD: testpass
+    ports:
+      - "3307:3306"
+    volumes:
+      - ./mysql2_data:/var/lib/mysql
+      - ./config/galera-node2.cnf:/etc/mysql/conf.d/galera.cnf
+      - ./init-scripts:/docker-entrypoint-initdb.d
+    networks:
+      mysql_cluster:
+        ipv4_address: 172.30.0.11
+    restart: unless-stopped
+    depends_on:
+      - galera-node1
+
+  galera-node3:
+    image: mariadb:10.11
+    container_name: galera-node3
+    hostname: galera-node3
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: testdb
+      MYSQL_USER: testuser
+      MYSQL_PASSWORD: testpass
+    ports:
+      - "3308:3306"
+    volumes:
+      - ./mysql3_data:/var/lib/mysql
+      - ./config/galera-node3.cnf:/etc/mysql/conf.d/galera.cnf
+      - ./init-scripts:/docker-entrypoint-initdb.d
+    networks:
+      mysql_cluster:
+        ipv4_address: 172.30.0.12
+    restart: unless-stopped
+    depends_on:
+      - galera-node1
+
+  # ProxySQL for load balancing
+  proxysql:
+    image: proxysql/proxysql:2.5.5
+    container_name: proxysql
+    hostname: proxysql
+    ports:
+      - "6032:6032"  # Admin interface
+      - "6033:6033"  # MySQL interface
+    volumes:
+      - ./config/proxysql.cnf:/etc/proxysql.cnf
+      - ./proxysql_data:/var/lib/proxysql
+    networks:
+      mysql_cluster:
+        ipv4_address: 172.30.0.20
+    restart: unless-stopped
+    depends_on:
+      - galera-node1
+      - galera-node2
+      - galera-node3
+
+  # phpMyAdmin for easy database management
+  phpmyadmin:
+    image: arm64v8/phpmyadmin:latest
+    platform: linux/arm64/v8
+    container_name: phpmyadmin
+    environment:
+      PMA_ARBITRARY: 1
+      PMA_HOST: proxysql
+      PMA_PORT: 6033
+      PMA_USER: root
+      PMA_PASSWORD: rootpassword
+    ports:
+      - "8888:80"
+    networks:
+      - mysql_cluster
+    restart: unless-stopped
+    depends_on:
+      - proxysql
+
+volumes:
+  mysql1_data:
+  mysql2_data:
+  mysql3_data:
+  proxysql_data:
+
+networks:
+  mysql_cluster:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.30.0.0/16 

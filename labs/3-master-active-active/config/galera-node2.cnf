@@ -1,0 +1,39 @@
+[mysqld]
+# Basic Settings
+bind-address=0.0.0.0
+default_storage_engine=innodb
+binlog_format=ROW
+innodb_autoinc_lock_mode=2
+innodb_flush_log_at_trx_commit=0
+innodb_buffer_pool_size=122M
+
+# Galera Provider Configuration
+wsrep_on=ON
+wsrep_provider=/usr/lib/galera/libgalera_smm.so
+wsrep_cluster_name=galera_cluster
+wsrep_cluster_address=gcomm://galera-node1,galera-node2,galera-node3
+wsrep_node_name=node2
+wsrep_node_address=galera-node2
+
+# SST Configuration
+wsrep_sst_method=rsync
+
+# Galera Node Configuration
+wsrep_sync_wait=1
+wsrep_causal_reads=ON
+
+# Connection Settings
+max_connections=1000
+max_allowed_packet=16M
+thread_cache_size=128
+thread_stack=196K
+thread_handling=pool-of-threads
+
+# Query Cache
+query_cache_size=0
+query_cache_type=0
+
+# Logging
+slow_query_log=1
+slow_query_log_file=/var/log/mysql/mysql-slow.log
+long_query_time=2 
