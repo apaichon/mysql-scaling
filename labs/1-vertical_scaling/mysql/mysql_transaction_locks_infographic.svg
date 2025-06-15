@@ -1,0 +1,511 @@
+<svg viewBox="0 0 1200 1400" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Gradients -->
+    <linearGradient id="headerGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#2E86AB;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#A23B72;stop-opacity:1" />
+    </linearGradient>
+    
+    <linearGradient id="lockGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FF6B6B;stop-opacity:0.8" />
+      <stop offset="100%" style="stop-color:#EE5A24;stop-opacity:0.9" />
+    </linearGradient>
+    
+    <linearGradient id="successGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#26de81;stop-opacity:0.8" />
+      <stop offset="100%" style="stop-color:#20bf6b;stop-opacity:0.9" />
+    </linearGradient>
+    
+    <!-- Lock icon pattern -->
+    <g id="lockIcon">
+      <rect x="0" y="6" width="12" height="8" rx="1" fill="#FF6B6B" stroke="#C44569" stroke-width="1"/>
+      <path d="M3 6V4c0-1.66 1.34-3 3-3s3 1.34 3 3v2" fill="none" stroke="#C44569" stroke-width="2"/>
+    </g>
+    
+    <!-- Database icon -->
+    <g id="dbIcon">
+      <ellipse cx="8" cy="2" rx="6" ry="2" fill="#4834d4"/>
+      <path d="M2 2v8c0 1.1 2.7 2 6 2s6-0.9 6-2V2" fill="#4834d4"/>
+      <ellipse cx="8" cy="6" rx="6" ry="2" fill="#667eea"/>
+      <ellipse cx="8" cy="10" rx="6" ry="2" fill="#764ba2"/>
+    </g>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="1200" height="1400" fill="#f8f9fa"/>
+  
+  <!-- Header -->
+  <rect x="0" y="0" width="1200" height="80" fill="url(#headerGradient)"/>
+  <text x="600" y="45" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-size="28" font-weight="bold">
+    MySQL Transaction Locking Scenarios
+  </text>
+  
+  <!-- Section 1: Lock Types -->
+  <g transform="translate(50, 100)">
+    <rect x="0" y="0" width="1100" height="200" fill="white" stroke="#e1e8ed" stroke-width="2" rx="10"/>
+    <text x="20" y="30" font-family="Arial, sans-serif" font-size="20" font-weight="bold" fill="#2c3e50">
+      🔒 MySQL Lock Types
+    </text>
+    
+    <!-- Row-level Locks -->
+    <g transform="translate(20, 50)">
+      <rect x="0" y="0" width="250" height="120" fill="#fff5f5" stroke="#ff7675" stroke-width="1" rx="5"/>
+      <text x="125" y="20" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#d63031">
+        Row-Level Locks
+      </text>
+      <text x="10" y="40" font-family="Arial, sans-serif" font-size="12" fill="#2d3436">
+        • Shared (S) Lock
+      </text>
+      <text x="10" y="55" font-family="Arial, sans-serif" font-size="12" fill="#2d3436">
+        • Exclusive (X) Lock
+      </text>
+      <text x="10" y="70" font-family="Arial, sans-serif" font-size="12" fill="#2d3436">
+        • Record Lock
+      </text>
+      <text x="10" y="85" font-family="Arial, sans-serif" font-size="12" fill="#2d3436">
+        • Gap Lock
+      </text>
+      <text x="10" y="100" font-family="Arial, sans-serif" font-size="12" fill="#2d3436">
+        • Next-Key Lock
+      </text>
+    </g>
+    
+    <!-- Table-level Locks -->
+    <g transform="translate(290, 50)">
+      <rect x="0" y="0" width="250" height="120" fill="#f0f8ff" stroke="#74b9ff" stroke-width="1" rx="5"/>
+      <text x="125" y="20" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#0984e3">
+        Table-Level Locks
+      </text>
+      <text x="10" y="40" font-family="Arial, sans-serif" font-size="12" fill="#2d3436">
+        • Table Lock (READ)
+      </text>
+      <text x="10" y="55" font-family="Arial, sans-serif" font-size="12" fill="#2d3436">
+        • Table Lock (WRITE)
+      </text>
+      <text x="10" y="70" font-family="Arial, sans-serif" font-size="12" fill="#2d3436">
+        • Metadata Lock
+      </text>
+      <text x="10" y="85" font-family="Arial, sans-serif" font-size="12" fill="#2d3436">
+        • Auto-Inc Lock
+      </text>
+    </g>
+    
+    <!-- Intent Locks -->
+    <g transform="translate(560, 50)">
+      <rect x="0" y="0" width="250" height="120" fill="#f0fff0" stroke="#00b894" stroke-width="1" rx="5"/>
+      <text x="125" y="20" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#00853d">
+        Intent Locks
+      </text>
+      <text x="10" y="40" font-family="Arial, sans-serif" font-size="12" fill="#2d3436">
+        • Intent Shared (IS)
+      </text>
+      <text x="10" y="55" font-family="Arial, sans-serif" font-size="12" fill="#2d3436">
+        • Intent Exclusive (IX)
+      </text>
+      <text x="10" y="70" font-family="Arial, sans-serif" font-size="12" fill="#2d3436">
+        • Shared Intent Exclusive (SIX)
+      </text>
+    </g>
+    
+    <!-- Deadlock Info -->
+    <g transform="translate(830, 50)">
+      <rect x="0" y="0" width="250" height="120" fill="#fff0f5" stroke="#fd79a8" stroke-width="1" rx="5"/>
+      <text x="125" y="20" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#e84393">
+        Deadlock Detection
+      </text>
+      <text x="10" y="40" font-family="Arial, sans-serif" font-size="12" fill="#2d3436">
+        • Automatic detection
+      </text>
+      <text x="10" y="55" font-family="Arial, sans-serif" font-size="12" fill="#2d3436">
+        • Victim selection
+      </text>
+      <text x="10" y="70" font-family="Arial, sans-serif" font-size="12" fill="#2d3436">
+        • Transaction rollback
+      </text>
+      <text x="10" y="85" font-family="Arial, sans-serif" font-size="12" fill="#2d3436">
+        • innodb_deadlock_detect
+      </text>
+    </g>
+  </g>
+  
+  <!-- Section 2: Scenario 1 - Simple Row Lock -->
+  <g transform="translate(50, 320)">
+    <rect x="0" y="0" width="1100" height="280" fill="white" stroke="#e1e8ed" stroke-width="2" rx="10"/>
+    <text x="20" y="30" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="#2c3e50">
+      📊 Scenario 1: Row-Level Locking Conflict
+    </text>
+    
+    <!-- Timeline -->
+    <line x1="20" y1="80" x2="1060" y2="80" stroke="#bdc3c7" stroke-width="2"/>
+    <text x="20" y="75" font-family="Arial, sans-serif" font-size="12" fill="#7f8c8d">Time →</text>
+    
+    <!-- Transaction A -->
+    <g transform="translate(20, 100)">
+      <rect x="0" y="0" width="500" height="60" fill="#e8f4fd" stroke="#3498db" stroke-width="2" rx="5"/>
+      <text x="10" y="20" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#2980b9">
+        Transaction A (Session 1)
+      </text>
+      <text x="10" y="35" font-family="Arial, sans-serif" font-size="12" fill="#34495e">
+        BEGIN; UPDATE users SET name='John' WHERE id=1;
+      </text>
+      <text x="10" y="50" font-family="Arial, sans-serif" font-size="12" fill="#27ae60">
+        ✓ Acquires X lock on row id=1
+      </text>
+    </g>
+    
+    <!-- Lock visualization -->
+    <g transform="translate(540, 110)">
+      <rect x="0" y="0" width="80" height="40" fill="url(#lockGradient)" rx="5"/>
+      <use href="#lockIcon" x="34" y="14" fill="white"/>
+      <text x="40" y="55" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#c0392b">
+        X Lock
+      </text>
+    </g>
+    
+    <!-- Database row -->
+    <g transform="translate(640, 100)">
+      <rect x="0" y="0" width="120" height="60" fill="#f39c12" stroke="#e67e22" stroke-width="2" rx="5"/>
+      <use href="#dbIcon" x="52" y="15"/>
+      <text x="60" y="55" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#d35400">
+        Row id=1
+      </text>
+    </g>
+    
+    <!-- Transaction B -->
+    <g transform="translate(20, 180)">
+      <rect x="0" y="0" width="500" height="60" fill="#fdf2e9" stroke="#e67e22" stroke-width="2" rx="5"/>
+      <text x="10" y="20" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#d35400">
+        Transaction B (Session 2)
+      </text>
+      <text x="10" y="35" font-family="Arial, sans-serif" font-size="12" fill="#34495e">
+        BEGIN; UPDATE users SET name='Jane' WHERE id=1;
+      </text>
+      <text x="10" y="50" font-family="Arial, sans-serif" font-size="12" fill="#e74c3c">
+        ⏳ WAITING for X lock on row id=1
+      </text>
+    </g>
+    
+    <!-- Waiting indicator -->
+    <g transform="translate(540, 190)">
+      <circle cx="40" cy="20" r="20" fill="#f39c12" opacity="0.7"/>
+      <text x="40" y="25" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="white">⏳</text>
+      <text x="40" y="55" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#e67e22">
+        Waiting
+      </text>
+    </g>
+    
+    <!-- Arrow -->
+    <path d="M 600 130 Q 620 150 600 170" fill="none" stroke="#e74c3c" stroke-width="2" marker-end="url(#arrowhead)"/>
+    
+    <!-- Resolution -->
+    <g transform="translate(780, 120)">
+      <rect x="0" y="0" width="280" height="100" fill="#eafaf1" stroke="#27ae60" stroke-width="2" rx="5"/>
+      <text x="10" y="20" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#27ae60">
+        Resolution:
+      </text>
+      <text x="10" y="40" font-family="Arial, sans-serif" font-size="12" fill="#2d3436">
+        1. Transaction A commits/rollbacks
+      </text>
+      <text x="10" y="55" font-family="Arial, sans-serif" font-size="12" fill="#2d3436">
+        2. X lock on row id=1 is released
+      </text>
+      <text x="10" y="70" font-family="Arial, sans-serif" font-size="12" fill="#2d3436">
+        3. Transaction B acquires lock
+      </text>
+      <text x="10" y="85" font-family="Arial, sans-serif" font-size="12" fill="#2d3436">
+        4. Transaction B proceeds
+      </text>
+    </g>
+  </g>
+  
+  <!-- Section 3: Deadlock Scenario -->
+  <g transform="translate(50, 620)">
+    <rect x="0" y="0" width="1100" height="350" fill="white" stroke="#e1e8ed" stroke-width="2" rx="10"/>
+    <text x="20" y="30" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="#2c3e50">
+      ⚠️ Scenario 2: Deadlock Situation
+    </text>
+    
+    <!-- Timeline -->
+    <line x1="20" y1="80" x2="1060" y2="80" stroke="#bdc3c7" stroke-width="2"/>
+    
+    <!-- Step 1 -->
+    <g transform="translate(50, 100)">
+      <circle cx="0" cy="0" r="15" fill="#3498db"/>
+      <text x="0" y="5" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="white" font-weight="bold">1</text>
+      <text x="0" y="35" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#2c3e50">T1 locks A</text>
+    </g>
+    
+    <!-- Step 2 -->
+    <g transform="translate(250, 100)">
+      <circle cx="0" cy="0" r="15" fill="#e67e22"/>
+      <text x="0" y="5" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="white" font-weight="bold">2</text>
+      <text x="0" y="35" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#2c3e50">T2 locks B</text>
+    </g>
+    
+    <!-- Step 3 -->
+    <g transform="translate(450, 100)">
+      <circle cx="0" cy="0" r="15" fill="#e74c3c"/>
+      <text x="0" y="5" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="white" font-weight="bold">3</text>
+      <text x="0" y="35" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#2c3e50">T1 waits B</text>
+    </g>
+    
+    <!-- Step 4 -->
+    <g transform="translate(650, 100)">
+      <circle cx="0" cy="0" r="15" fill="#9b59b6"/>
+      <text x="0" y="5" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="white" font-weight="bold">4</text>
+      <text x="0" y="35" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#2c3e50">T2 waits A</text>
+    </g>
+    
+    <!-- Deadlock Detection -->
+    <g transform="translate(850, 100)">
+      <circle cx="0" cy="0" r="15" fill="#f39c12"/>
+      <text x="0" y="5" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="white" font-weight="bold">!</text>
+      <text x="0" y="35" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#2c3e50">Deadlock!</text>
+    </g>
+    
+    <!-- Transaction details -->
+    <g transform="translate(20, 160)">
+      <!-- Transaction 1 -->
+      <rect x="0" y="0" width="500" height="80" fill="#e8f4fd" stroke="#3498db" stroke-width="2" rx="5"/>
+      <text x="10" y="20" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#2980b9">
+        Transaction 1
+      </text>
+      <text x="10" y="35" font-family="Arial, sans-serif" font-size="12" fill="#34495e">
+        UPDATE accounts SET balance=balance-100 WHERE id=1;
+      </text>
+      <text x="10" y="50" font-family="Arial, sans-serif" font-size="12" fill="#34495e">
+        UPDATE accounts SET balance=balance+100 WHERE id=2;
+      </text>
+      <text x="10" y="65" font-family="Arial, sans-serif" font-size="12" fill="#27ae60">
+        ✓ Holds lock on id=1, ⏳ Waits for id=2
+      </text>
+      
+      <!-- Transaction 2 -->
+      <rect x="520" y="0" width="500" height="80" fill="#fdf2e9" stroke="#e67e22" stroke-width="2" rx="5"/>
+      <text x="530" y="20" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#d35400">
+        Transaction 2
+      </text>
+      <text x="530" y="35" font-family="Arial, sans-serif" font-size="12" fill="#34495e">
+        UPDATE accounts SET balance=balance-50 WHERE id=2;
+      </text>
+      <text x="530" y="50" font-family="Arial, sans-serif" font-size="12" fill="#34495e">
+        UPDATE accounts SET balance=balance+50 WHERE id=1;
+      </text>
+      <text x="530" y="65" font-family="Arial, sans-serif" font-size="12" fill="#27ae60">
+        ✓ Holds lock on id=2, ⏳ Waits for id=1
+      </text>
+    </g>
+    
+    <!-- Deadlock Resolution -->
+    <g transform="translate(20, 260)">
+      <rect x="0" y="0" width="1000" height="70" fill="#fff5f5" stroke="#e74c3c" stroke-width="2" rx="5"/>
+      <text x="20" y="25" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#c0392b">
+        🛡️ MySQL Deadlock Resolution:
+      </text>
+      <text x="20" y="45" font-family="Arial, sans-serif" font-size="12" fill="#2d3436">
+        1. InnoDB detects the deadlock automatically  |  2. Selects victim transaction (smallest weight)  |  3. Rolls back victim transaction
+      </text>
+      <text x="20" y="60" font-family="Arial, sans-serif" font-size="12" fill="#2d3436">
+        4. Returns ERROR 1213 (40001): Deadlock found  |  5. Other transaction proceeds normally
+      </text>
+    </g>
+  </g>
+  
+  <!-- Section 4: Lock Compatibility Matrix -->
+  <g transform="translate(50, 990)">
+    <rect x="0" y="0" width="1100" height="280" fill="white" stroke="#e1e8ed" stroke-width="2" rx="10"/>
+    <text x="20" y="30" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="#2c3e50">
+      🔄 Lock Compatibility Matrix
+    </text>
+    
+    <!-- Matrix -->
+    <g transform="translate(50, 50)">
+      <!-- Headers -->
+      <rect x="0" y="0" width="100" height="40" fill="#34495e"/>
+      <text x="50" y="25" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="white" font-weight="bold">Lock Type</text>
+      
+      <rect x="100" y="0" width="80" height="40" fill="#3498db"/>
+      <text x="140" y="15" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="white" font-weight="bold">IS</text>
+      <text x="140" y="30" text-anchor="middle" font-family="Arial, sans-serif" font-size="8" fill="white">(Intent Shared)</text>
+      
+      <rect x="180" y="0" width="80" height="40" fill="#e67e22"/>
+      <text x="220" y="15" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="white" font-weight="bold">IX</text>
+      <text x="220" y="30" text-anchor="middle" font-family="Arial, sans-serif" font-size="8" fill="white">(Intent Exclusive)</text>
+      
+      <rect x="260" y="0" width="80" height="40" fill="#27ae60"/>
+      <text x="300" y="15" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="white" font-weight="bold">S</text>
+      <text x="300" y="30" text-anchor="middle" font-family="Arial, sans-serif" font-size="8" fill="white">(Shared)</text>
+      
+      <rect x="340" y="0" width="80" height="40" fill="#e74c3c"/>
+      <text x="380" y="15" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="white" font-weight="bold">X</text>
+      <text x="380" y="30" text-anchor="middle" font-family="Arial, sans-serif" font-size="8" fill="white">(Exclusive)</text>
+      
+      <!-- Rows -->
+      <!-- IS row -->
+      <rect x="0" y="40" width="100" height="30" fill="#3498db"/>
+      <text x="50" y="60" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="white" font-weight="bold">IS</text>
+      
+      <rect x="100" y="40" width="80" height="30" fill="#d5f4e6" stroke="#27ae60"/>
+      <text x="140" y="60" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#27ae60" font-weight="bold">✓</text>
+      
+      <rect x="180" y="40" width="80" height="30" fill="#d5f4e6" stroke="#27ae60"/>
+      <text x="220" y="60" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#27ae60" font-weight="bold">✓</text>
+      
+      <rect x="260" y="40" width="80" height="30" fill="#d5f4e6" stroke="#27ae60"/>
+      <text x="300" y="60" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#27ae60" font-weight="bold">✓</text>
+      
+      <rect x="340" y="40" width="80" height="30" fill="#ffeaa7" stroke="#fdcb6e"/>
+      <text x="380" y="60" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#e17055" font-weight="bold">✗</text>
+      
+      <!-- IX row -->
+      <rect x="0" y="70" width="100" height="30" fill="#e67e22"/>
+      <text x="50" y="90" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="white" font-weight="bold">IX</text>
+      
+      <rect x="100" y="70" width="80" height="30" fill="#d5f4e6" stroke="#27ae60"/>
+      <text x="140" y="90" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#27ae60" font-weight="bold">✓</text>
+      
+      <rect x="180" y="70" width="80" height="30" fill="#d5f4e6" stroke="#27ae60"/>
+      <text x="220" y="90" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#27ae60" font-weight="bold">✓</text>
+      
+      <rect x="260" y="70" width="80" height="30" fill="#ffeaa7" stroke="#fdcb6e"/>
+      <text x="300" y="90" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#e17055" font-weight="bold">✗</text>
+      
+      <rect x="340" y="70" width="80" height="30" fill="#ffeaa7" stroke="#fdcb6e"/>
+      <text x="380" y="90" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#e17055" font-weight="bold">✗</text>
+      
+      <!-- S row -->
+      <rect x="0" y="100" width="100" height="30" fill="#27ae60"/>
+      <text x="50" y="120" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="white" font-weight="bold">S</text>
+      
+      <rect x="100" y="100" width="80" height="30" fill="#d5f4e6" stroke="#27ae60"/>
+      <text x="140" y="120" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#27ae60" font-weight="bold">✓</text>
+      
+      <rect x="180" y="100" width="80" height="30" fill="#ffeaa7" stroke="#fdcb6e"/>
+      <text x="220" y="120" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#e17055" font-weight="bold">✗</text>
+      
+      <rect x="260" y="100" width="80" height="30" fill="#d5f4e6" stroke="#27ae60"/>
+      <text x="300" y="120" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#27ae60" font-weight="bold">✓</text>
+      
+      <rect x="340" y="100" width="80" height="30" fill="#ffeaa7" stroke="#fdcb6e"/>
+      <text x="380" y="120" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#e17055" font-weight="bold">✗</text>
+      
+      <!-- X row -->
+      <rect x="0" y="130" width="100" height="30" fill="#e74c3c"/>
+      <text x="50" y="150" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="white" font-weight="bold">X</text>
+      
+      <rect x="100" y="130" width="80" height="30" fill="#ffeaa7" stroke="#fdcb6e"/>
+      <text x="140" y="150" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#e17055" font-weight="bold">✗</text>
+      
+      <rect x="180" y="130" width="80" height="30" fill="#ffeaa7" stroke="#fdcb6e"/>
+      <text x="220" y="150" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#e17055" font-weight="bold">✗</text>
+      
+      <rect x="260" y="130" width="80" height="30" fill="#ffeaa7" stroke="#fdcb6e"/>
+      <text x="300" y="150" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#e17055" font-weight="bold">✗</text>
+      
+      <rect x="340" y="130" width="80" height="30" fill="#ffeaa7" stroke="#fdcb6e"/>
+      <text x="380" y="150" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#e17055" font-weight="bold">✗</text>
+    </g>
+    
+    <!-- Legend -->
+    <g transform="translate(500, 60)">
+      <rect x="0" y="0" width="250" height="120" fill="#f8f9fa" stroke="#dee2e6" stroke-width="1" rx="5"/>
+      <text x="10" y="20" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#2c3e50">
+        Legend:
+      </text>
+      <g transform="translate(10, 30)">
+        <rect x="0" y="0" width="15" height="15" fill="#d5f4e6" stroke="#27ae60"/>
+        <text x="0" y="8" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#27ae60" font-weight="bold">✓</text>
+        <text x="25" y="12" font-family="Arial, sans-serif" font-size="12" fill="#2c3e50">Compatible</text>
+      </g>
+      <g transform="translate(10, 50)">
+        <rect x="0" y="0" width="15" height="15" fill="#ffeaa7" stroke="#fdcb6e"/>
+        <text x="0" y="8" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#e17055" font-weight="bold">✗</text>
+        <text x="25" y="12" font-family="Arial, sans-serif" font-size="12" fill="#2c3e50">Incompatible</text>
+      </g>
+      <text x="10" y="85" font-family="Arial, sans-serif" font-size="10" fill="#7f8c8d">
+        Note: Incompatible locks cause
+      </text>
+      <text x="10" y="98" font-family="Arial, sans-serif" font-size="10" fill="#7f8c8d">
+        transactions to wait or deadlock
+      </text>
+    </g>
+    
+    <!-- Best Practices -->
+    <g transform="translate(780, 60)">
+      <rect x="0" y="0" width="280" height="160" fill="#f0f8ff" stroke="#74b9ff" stroke-width="1" rx="5"/>
+      <text x="10" y="20" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#0984e3">
+        🛡️ Best Practices:
+      </text>
+      <text x="10" y="40" font-family="Arial, sans-serif" font-size="11" fill="#2d3436">
+        • Keep transactions short
+      </text>
+      <text x="10" y="55" font-family="Arial, sans-serif" font-size="11" fill="#2d3436">
+        • Access tables in consistent order
+      </text>
+      <text x="10" y="70" font-family="Arial, sans-serif" font-size="11" fill="#2d3436">
+        • Use appropriate isolation levels
+      </text>
+      <text x="10" y="85" font-family="Arial, sans-serif" font-size="11" fill="#2d3436">
+        • Implement retry logic for deadlocks
+      </text>
+      <text x="10" y="100" font-family="Arial, sans-serif" font-size="11" fill="#2d3436">
+        • Monitor innodb_deadlocks
+      </text>
+      <text x="10" y="115" font-family="Arial, sans-serif" font-size="11" fill="#2d3436">
+        • Use SELECT FOR UPDATE judiciously
+      </text>
+      <text x="10" y="130" font-family="Arial, sans-serif" font-size="11" fill="#2d3436">
+        • Consider READ COMMITTED level
+      </text>
+      <text x="10" y="145" font-family="Arial, sans-serif" font-size="11" fill="#2d3436">
+        • Index foreign key columns
+      </text>
+    </g>
+  </g>
+  
+  <!-- Section 5: Lock Wait Timeout -->
+  <g transform="translate(50, 1290)">
+    <rect x="0" y="0" width="1100" height="100" fill="white" stroke="#e1e8ed" stroke-width="2" rx="10"/>
+    <text x="20" y="30" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="#2c3e50">
+      ⏰ Lock Wait Timeout Configuration
+    </text>
+    
+    <g transform="translate(20, 45)">
+      <rect x="0" y="0" width="350" height="40" fill="#fff5f5" stroke="#ff7675" stroke-width="1" rx="5"/>
+      <text x="10" y="15" font-family="Arial, sans-serif" font-size="12" fill="#2d3436">
+        <tspan font-weight="bold">innodb_lock_wait_timeout</tspan> = 50 seconds
+      </text>
+      <text x="10" y="30" font-family="Arial, sans-serif" font-size="10" fill="#636e72">
+        Time to wait before giving up on lock acquisition
+      </text>
+    </g>
+    
+    <g transform="translate(390, 45)">
+      <rect x="0" y="0" width="350" height="40" fill="#f0f8ff" stroke="#74b9ff" stroke-width="1" rx="5"/>
+      <text x="10" y="15" font-family="Arial, sans-serif" font-size="12" fill="#2d3436">
+        <tspan font-weight="bold">innodb_deadlock_detect</tspan> = ON
+      </text>
+      <text x="10" y="30" font-family="Arial, sans-serif" font-size="10" fill="#636e72">
+        Automatically detect and resolve deadlocks
+      </text>
+    </g>
+    
+    <g transform="translate(760, 45)">
+      <rect x="0" y="0" width="320" height="40" fill="#f0fff0" stroke="#00b894" stroke-width="1" rx="5"/>
+      <text x="10" y="15" font-family="Arial, sans-serif" font-size="12" fill="#2d3436">
+        <tspan font-weight="bold">SHOW ENGINE INNODB STATUS</tspan>
+      </text>
+      <text x="10" y="30" font-family="Arial, sans-serif" font-size="10" fill="#636e72">
+        Monitor current locks and deadlocks
+      </text>
+    </g>
+  </g>
+  
+  <!-- Arrow marker definition -->
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" 
+     refX="0" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#e74c3c" />
+    </marker>
+  </defs>
+</svg>

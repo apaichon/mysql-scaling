@@ -138,3 +138,6 @@ dist
 *_data
 *-data
 *_results
+
+.DS_Store
+.vscode

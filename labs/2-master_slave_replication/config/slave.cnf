@@ -6,9 +6,8 @@ server-id = 2
 relay-log = mysql-relay-bin
 log-slave-updates = 1
 
-# Read-only mode for slaves
-read-only = 1
-super-read-only = 1
+# Read-only mode for slaves (will be set during setup)
+read-only = 0
 
 # GTID-based replication
 gtid-mode = ON

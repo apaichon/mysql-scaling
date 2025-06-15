@@ -42,7 +42,58 @@ wait_for_mysql "mysql-slave2"
 
 # Additional wait to ensure initialization scripts have run
 echo -e "${YELLOW}Waiting for initialization scripts to complete...${NC}"
-sleep 10
+sleep 15
+
+# Verify master has the database and data
+echo -e "${BLUE}Verifying master database...${NC}"
+MASTER_DB_CHECK=$(docker exec mysql-master mysql -uroot -pmasterpassword -e "SHOW DATABASES;" 2>/dev/null | grep testdb)
+if [ -z "$MASTER_DB_CHECK" ]; then
+    echo -e "${RED}Master database 'testdb' not found. Please check the initialization scripts.${NC}"
+    exit 1
+fi
+
+echo -e "${GREEN}Master database 'testdb' exists${NC}"
+
+# Set root password on slaves and create necessary users
+echo -e "${BLUE}Setting up slave1...${NC}"
+docker exec mysql-slave1 mysql -u root -e "
+ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'slavepassword';
+CREATE DATABASE IF NOT EXISTS testdb;
+CREATE USER IF NOT EXISTS 'replicator'@'%' IDENTIFIED WITH mysql_native_password BY 'replicatorpassword';
+GRANT REPLICATION SLAVE ON *.* TO 'replicator'@'%';
+CREATE USER IF NOT EXISTS 'appuser'@'%' IDENTIFIED WITH mysql_native_password BY 'apppassword';
+GRANT SELECT, INSERT, UPDATE, DELETE ON testdb.* TO 'appuser'@'%';
+FLUSH PRIVILEGES;
+"
+
+echo -e "${BLUE}Setting up slave2...${NC}"
+docker exec mysql-slave2 mysql -u root -e "
+ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'slavepassword';
+CREATE DATABASE IF NOT EXISTS testdb;
+CREATE USER IF NOT EXISTS 'replicator'@'%' IDENTIFIED WITH mysql_native_password BY 'replicatorpassword';
+GRANT REPLICATION SLAVE ON *.* TO 'replicator'@'%';
+CREATE USER IF NOT EXISTS 'appuser'@'%' IDENTIFIED WITH mysql_native_password BY 'apppassword';
+GRANT SELECT, INSERT, UPDATE, DELETE ON testdb.* TO 'appuser'@'%';
+FLUSH PRIVILEGES;
+"
+
+# Copy database structure and data from master to slaves
+echo -e "${BLUE}Copying database structure from master to slave1...${NC}"
+docker exec mysql-master mysqldump -uroot -pmasterpassword --no-tablespaces --single-transaction --routines --triggers testdb | docker exec -i mysql-slave1 mysql -uroot -pslavepassword testdb
+
+echo -e "${BLUE}Copying database structure from master to slave2...${NC}"
+docker exec mysql-master mysqldump -uroot -pmasterpassword --no-tablespaces --single-transaction --routines --triggers testdb | docker exec -i mysql-slave2 mysql -uroot -pslavepassword testdb
+
+# Enable read-only on slaves
+echo -e "${BLUE}Enabling read-only mode on slaves...${NC}"
+docker exec mysql-slave1 mysql -uroot -pslavepassword -e "
+SET GLOBAL read_only = 1;
+SET GLOBAL super_read_only = 1;
+"
+docker exec mysql-slave2 mysql -uroot -pslavepassword -e "
+SET GLOBAL read_only = 1;
+SET GLOBAL super_read_only = 1;
+"
 
 # Get master status
 echo -e "${BLUE}Getting master status...${NC}"
@@ -99,10 +150,41 @@ docker exec mysql-slave1 mysql -uroot -pslavepassword -e "SHOW SLAVE STATUS\G" |
 echo -e "${BLUE}Checking slave2 status...${NC}"
 docker exec mysql-slave2 mysql -uroot -pslavepassword -e "SHOW SLAVE STATUS\G" | grep -E "(Slave_IO_Running|Slave_SQL_Running|Last_Error)"
 
+# Verify data is present on all nodes
+echo -e "${BLUE}Verifying data on all nodes...${NC}"
+echo -e "${YELLOW}Master users count:${NC}"
+docker exec mysql-master mysql -uroot -pmasterpassword -e "USE testdb; SELECT COUNT(*) as user_count FROM users;"
+
+echo -e "${YELLOW}Slave1 users count:${NC}"
+docker exec mysql-slave1 mysql -uroot -pslavepassword -e "USE testdb; SELECT COUNT(*) as user_count FROM users;"
+
+echo -e "${YELLOW}Slave2 users count:${NC}"
+docker exec mysql-slave2 mysql -uroot -pslavepassword -e "USE testdb; SELECT COUNT(*) as user_count FROM users;"
+
+# Test replication by inserting data on master
+echo -e "${BLUE}Testing replication with a new user...${NC}"
+docker exec mysql-master mysql -uroot -pmasterpassword -e "
+USE testdb;
+INSERT INTO users (username, email, first_name, last_name) 
+VALUES ('test_replication', 'test@replication.com', 'Test', 'Replication');
+"
+
+# Wait for replication
+sleep 3
+
+# Check if the new user appears on slaves
+echo -e "${YELLOW}Checking if new user appears on slaves...${NC}"
+echo -e "${YELLOW}Slave1:${NC}"
+docker exec mysql-slave1 mysql -uroot -pslavepassword -e "USE testdb; SELECT username, email FROM users WHERE username = 'test_replication';"
+
+echo -e "${YELLOW}Slave2:${NC}"
+docker exec mysql-slave2 mysql -uroot -pslavepassword -e "USE testdb; SELECT username, email FROM users WHERE username = 'test_replication';"
+
 echo -e "${GREEN}=== Replication setup complete! ===${NC}"
 echo -e "${YELLOW}Master: localhost:3306${NC}"
 echo -e "${YELLOW}Slave1: localhost:3307${NC}"
 echo -e "${YELLOW}Slave2: localhost:3308${NC}"
 echo -e "${YELLOW}phpMyAdmin: http://localhost:8888${NC}"
 echo ""
-echo -e "${BLUE}To test replication, run: ./test-replication.sh${NC}" 
+echo -e "${BLUE}To test replication, run: ./test-replication.sh${NC}"
+echo -e "${BLUE}To test the Node.js API, run: cd app && npm start${NC}" 

@@ -147,7 +147,7 @@ class ConcurrentTester {
         const queryTemplates = [
             'SELECT COUNT(*) FROM concurrent_test WHERE thread_id = ?',
             'SELECT * FROM concurrent_test WHERE operation_type = ? ORDER BY created_at DESC LIMIT 100',
-            'SELECT thread_id, COUNT(*) as count, AVG(JSON_EXTRACT(data, "$.random")) as avg_random FROM concurrent_test GROUP BY thread_id',
+            'SELECT thread_id, COUNT(*) as count, AVG(JSON_EXTRACT(data, "$.random")) as avg_random FROM concurrent_test where thread_id = ? GROUP BY thread_id',
             'SELECT * FROM concurrent_test WHERE created_at >= ? ORDER BY id DESC LIMIT 50'
         ];
 
@@ -172,7 +172,7 @@ class ConcurrentTester {
                                 params = ['INSERT'];
                                 break;
                             case 2:
-                                params = [];
+                                params = [threadId % 10];
                                 break;
                             case 3:
                                 params = [moment().subtract(1, 'minute').format('YYYY-MM-DD HH:mm:ss')];
@@ -373,9 +373,9 @@ class ConcurrentTester {
 
         // Run concurrent tests
         const insertResult = await this.runConcurrentInserts(threadCount, recordsPerThread);
-        const selectResult = await this.runConcurrentReads(threadCount, recordsPerThread / 2);
+        const selectResult = await this.runConcurrentReads(threadCount, recordsPerThread / 1000);
         const updateResult = await this.runConcurrentUpdates(threadCount, recordsPerThread / 4);
-        const mixedResult = await this.runMixedWorkload(threadCount, recordsPerThread / 2);
+        const mixedResult = await this.runMixedWorkload(threadCount, recordsPerThread / 1000);
 
         const testEndTime = process.hrtime.bigint();
         const totalDuration = Number(testEndTime - testStartTime) / 1000000;

@@ -1,0 +1,388 @@
+<svg viewBox="0 0 1400 1600" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Gradients -->
+    <linearGradient id="headerGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#764ba2;stop-opacity:1" />
+    </linearGradient>
+    
+    <linearGradient id="smallBufferGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#ff7675;stop-opacity:0.8" />
+      <stop offset="100%" style="stop-color:#d63031;stop-opacity:0.9" />
+    </linearGradient>
+    
+    <linearGradient id="largeBufferGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00b894;stop-opacity:0.8" />
+      <stop offset="100%" style="stop-color:#00853d;stop-opacity:0.9" />
+    </linearGradient>
+    
+    <linearGradient id="diskGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#fdcb6e;stop-opacity:0.8" />
+      <stop offset="100%" style="stop-color:#e17055;stop-opacity:0.9" />
+    </linearGradient>
+    
+    <!-- Patterns for data blocks -->
+    <pattern id="dataPattern" patternUnits="userSpaceOnUse" width="8" height="8">
+      <rect width="8" height="8" fill="#74b9ff"/>
+      <rect x="0" y="0" width="4" height="4" fill="#0984e3"/>
+      <rect x="4" y="4" width="4" height="4" fill="#0984e3"/>
+    </pattern>
+    
+    <pattern id="dirtyPattern" patternUnits="userSpaceOnUse" width="8" height="8">
+      <rect width="8" height="8" fill="#fd79a8"/>
+      <rect x="0" y="0" width="4" height="4" fill="#e84393"/>
+      <rect x="4" y="4" width="4" height="4" fill="#e84393"/>
+    </pattern>
+    
+    <!-- Arrow markers -->
+    <marker id="arrowRed" markerWidth="10" markerHeight="7" refX="0" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#d63031" />
+    </marker>
+    
+    <marker id="arrowGreen" markerWidth="10" markerHeight="7" refX="0" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#00b894" />
+    </marker>
+    
+    <marker id="arrowBlue" markerWidth="10" markerHeight="7" refX="0" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#0984e3" />
+    </marker>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="1400" height="1600" fill="#f8f9fa"/>
+  
+  <!-- Header -->
+  <rect x="0" y="0" width="1400" height="80" fill="url(#headerGradient)"/>
+  <text x="700" y="45" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-size="28" font-weight="bold">
+    InnoDB Buffer Pool Size: 128MB vs 6GB Performance Analysis
+  </text>
+  
+  <!-- Section 1: Buffer Pool Comparison -->
+  <g transform="translate(50, 100)">
+    <rect x="0" y="0" width="1300" height="300" fill="white" stroke="#e1e8ed" stroke-width="2" rx="10"/>
+    <text x="20" y="30" font-family="Arial, sans-serif" font-size="20" font-weight="bold" fill="#2c3e50">
+      📊 Buffer Pool Size Comparison
+    </text>
+    
+    <!-- Small Buffer Pool (128MB) -->
+    <g transform="translate(50, 50)">
+      <text x="250" y="20" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#d63031">
+        128MB Buffer Pool (Default)
+      </text>
+      
+      <!-- Buffer pool representation -->
+      <rect x="50" y="30" width="400" height="60" fill="url(#smallBufferGradient)" stroke="#d63031" stroke-width="2" rx="5"/>
+      <text x="250" y="50" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="white" font-weight="bold">
+        128MB Memory Cache
+      </text>
+      <text x="250" y="70" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="white">
+        ~8,000 pages (16KB each)
+      </text>
+      
+      <!-- Data blocks in buffer -->
+      <g transform="translate(60, 100)">
+        <rect x="0" y="0" width="30" height="20" fill="url(#dataPattern)" stroke="#0984e3"/>
+        <rect x="35" y="0" width="30" height="20" fill="url(#dataPattern)" stroke="#0984e3"/>
+        <rect x="70" y="0" width="30" height="20" fill="url(#dirtyPattern)" stroke="#e84393"/>
+        <rect x="105" y="0" width="30" height="20" fill="#ddd" stroke="#bbb"/>
+        <rect x="140" y="0" width="30" height="20" fill="#ddd" stroke="#bbb"/>
+        <text x="85" y="35" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#636e72">
+          Limited cached pages
+        </text>
+      </g>
+      
+      <!-- Stats -->
+      <g transform="translate(60, 140)">
+        <rect x="0" y="0" width="380" height="80" fill="#fff5f5" stroke="#ff7675" stroke-width="1" rx="3"/>
+        <text x="10" y="20" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#d63031">Performance Characteristics:</text>
+        <text x="10" y="35" font-family="Arial, sans-serif" font-size="11" fill="#2d3436">• Buffer Hit Ratio: ~85-90%</text>
+        <text x="10" y="50" font-family="Arial, sans-serif" font-size="11" fill="#2d3436">• Frequent disk I/O for data pages</text>
+        <text x="10" y="65" font-family="Arial, sans-serif" font-size="11" fill="#2d3436">• Fast cache searches (small memory space)</text>
+      </g>
+    </g>
+    
+    <!-- Large Buffer Pool (6GB) -->
+    <g transform="translate(650, 50)">
+      <text x="250" y="20" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#00853d">
+        6GB Buffer Pool (Optimized)
+      </text>
+      
+      <!-- Buffer pool representation -->
+      <rect x="50" y="30" width="400" height="60" fill="url(#largeBufferGradient)" stroke="#00b894" stroke-width="2" rx="5"/>
+      <text x="250" y="50" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="white" font-weight="bold">
+        6GB Memory Cache
+      </text>
+      <text x="250" y="70" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="white">
+        ~393,216 pages (16KB each)
+      </text>
+      
+      <!-- Data blocks in buffer -->
+      <g transform="translate(60, 100)">
+        <rect x="0" y="0" width="30" height="20" fill="url(#dataPattern)" stroke="#0984e3"/>
+        <rect x="35" y="0" width="30" height="20" fill="url(#dataPattern)" stroke="#0984e3"/>
+        <rect x="70" y="0" width="30" height="20" fill="url(#dataPattern)" stroke="#0984e3"/>
+        <rect x="105" y="0" width="30" height="20" fill="url(#dirtyPattern)" stroke="#e84393"/>
+        <rect x="140" y="0" width="30" height="20" fill="url(#dirtyPattern)" stroke="#e84393"/>
+        <rect x="175" y="0" width="30" height="20" fill="url(#dataPattern)" stroke="#0984e3"/>
+        <rect x="210" y="0" width="30" height="20" fill="url(#dataPattern)" stroke="#0984e3"/>
+        <rect x="245" y="0" width="30" height="20" fill="url(#dirtyPattern)" stroke="#e84393"/>
+        <rect x="280" y="0" width="30" height="20" fill="url(#dataPattern)" stroke="#0984e3"/>
+        <rect x="315" y="0" width="30" height="20" fill="url(#dataPattern)" stroke="#0984e3"/>
+        <text x="157" y="35" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#636e72">
+          Massive cached dataset
+        </text>
+      </g>
+      
+      <!-- Stats -->
+      <g transform="translate(60, 140)">
+        <rect x="0" y="0" width="380" height="80" fill="#eafaf1" stroke="#00b894" stroke-width="1" rx="3"/>
+        <text x="10" y="20" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#00853d">Performance Characteristics:</text>
+        <text x="10" y="35" font-family="Arial, sans-serif" font-size="11" fill="#2d3436">• Buffer Hit Ratio: ~98-99%</text>
+        <text x="10" y="50" font-family="Arial, sans-serif" font-size="11" fill="#2d3436">• Minimal disk I/O for cached data</text>
+        <text x="10" y="65" font-family="Arial, sans-serif" font-size="11" fill="#2d3436">• Slower cache searches (large memory space)</text>
+      </g>
+    </g>
+  </g>
+  
+  <!-- Section 2: Concurrent Insert Performance -->
+  <g transform="translate(50, 420)">
+    <rect x="0" y="0" width="1300" height="400" fill="white" stroke="#e1e8ed" stroke-width="2" rx="10"/>
+    <text x="20" y="30" font-family="Arial, sans-serif" font-size="20" font-weight="bold" fill="#2c3e50">
+      🚀 Why Larger Buffer Pool Improves Concurrent Inserts
+    </text>
+    
+    <!-- Small buffer scenario -->
+    <g transform="translate(50, 60)">
+      <text x="300" y="20" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#d63031">
+        128MB Buffer Pool - Limited Concurrency
+      </text>
+      
+      <!-- Multiple transactions competing -->
+      <g transform="translate(50, 40)">
+        <!-- Transaction 1 -->
+        <rect x="0" y="0" width="120" height="40" fill="#ff7675" stroke="#d63031" stroke-width="2" rx="3"/>
+        <text x="60" y="15" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="white" font-weight="bold">Transaction 1</text>
+        <text x="60" y="28" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="white">INSERT batch</text>
+        
+        <!-- Transaction 2 -->
+        <rect x="140" y="0" width="120" height="40" fill="#ff7675" stroke="#d63031" stroke-width="2" rx="3"/>
+        <text x="200" y="15" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="white" font-weight="bold">Transaction 2</text>
+        <text x="200" y="28" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="white">INSERT batch</text>
+        
+        <!-- Transaction 3 -->
+        <rect x="280" y="0" width="120" height="40" fill="#ff7675" stroke="#d63031" stroke-width="2" rx="3"/>
+        <text x="340" y="15" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="white" font-weight="bold">Transaction 3</text>
+        <text x="340" y="28" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="white">INSERT batch</text>
+        
+        <!-- Arrows pointing down to contention -->
+        <path d="M 60 45 L 60 70" stroke="#d63031" stroke-width="2" marker-end="url(#arrowRed)"/>
+        <path d="M 200 45 L 200 70" stroke="#d63031" stroke-width="2" marker-end="url(#arrowRed)"/>
+        <path d="M 340 45 L 340 70" stroke="#d63031" stroke-width="2" marker-end="url(#arrowRed)"/>
+      </g>
+      
+      <!-- Small buffer pool with contention -->
+      <g transform="translate(50, 80)">
+        <rect x="0" y="0" width="400" height="60" fill="#fff5f5" stroke="#ff7675" stroke-width="2" rx="5"/>
+        <text x="200" y="25" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#d63031" font-weight="bold">
+          Small Buffer Pool (128MB)
+        </text>
+        <text x="200" y="45" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#636e72">
+          Frequent page evictions • Cache misses • Disk I/O bottlenecks
+        </text>
+      </g>
+      
+      <!-- Issues -->
+      <g transform="translate(50, 160)">
+        <rect x="0" y="0" width="400" height="100" fill="#ffeaa7" stroke="#fdcb6e" stroke-width="1" rx="3"/>
+        <text x="10" y="20" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#e17055">⚠️ Concurrency Issues:</text>
+        <text x="10" y="35" font-family="Arial, sans-serif" font-size="11" fill="#2d3436">• Buffer pool thrashing</text>
+        <text x="10" y="50" font-family="Arial, sans-serif" font-size="11" fill="#2d3436">• Frequent LRU list management</text>
+        <text x="10" y="65" font-family="Arial, sans-serif" font-size="11" fill="#2d3436">• Page eviction overhead</text>
+        <text x="10" y="80" font-family="Arial, sans-serif" font-size="11" fill="#2d3436">• Lock contention on buffer pool mutex</text>
+      </g>
+    </g>
+    
+    <!-- Large buffer scenario -->
+    <g transform="translate(650, 60)">
+      <text x="300" y="20" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#00853d">
+        6GB Buffer Pool - High Concurrency
+      </text>
+      
+      <!-- Multiple transactions running smoothly -->
+      <g transform="translate(50, 40)">
+        <!-- Transaction 1 -->
+        <rect x="0" y="0" width="120" height="40" fill="#00b894" stroke="#00853d" stroke-width="2" rx="3"/>
+        <text x="60" y="15" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="white" font-weight="bold">Transaction 1</text>
+        <text x="60" y="28" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="white">Fast INSERT</text>
+        
+        <!-- Transaction 2 -->
+        <rect x="140" y="0" width="120" height="40" fill="#00b894" stroke="#00853d" stroke-width="2" rx="3"/>
+        <text x="200" y="15" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="white" font-weight="bold">Transaction 2</text>
+        <text x="200" y="28" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="white">Fast INSERT</text>
+        
+        <!-- Transaction 3 -->
+        <rect x="280" y="0" width="120" height="40" fill="#00b894" stroke="#00853d" stroke-width="2" rx="3"/>
+        <text x="340" y="15" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="white" font-weight="bold">Transaction 3</text>
+        <text x="340" y="28" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="white">Fast INSERT</text>
+        
+        <!-- Arrows pointing down to smooth operation -->
+        <path d="M 60 45 L 60 70" stroke="#00b894" stroke-width="2" marker-end="url(#arrowGreen)"/>
+        <path d="M 200 45 L 200 70" stroke="#00b894" stroke-width="2" marker-end="url(#arrowGreen)"/>
+        <path d="M 340 45 L 340 70" stroke="#00b894" stroke-width="2" marker-end="url(#arrowGreen)"/>
+      </g>
+      
+      <!-- Large buffer pool with smooth operation -->
+      <g transform="translate(50, 80)">
+        <rect x="0" y="0" width="400" height="60" fill="#eafaf1" stroke="#00b894" stroke-width="2" rx="5"/>
+        <text x="200" y="25" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#00853d" font-weight="bold">
+          Large Buffer Pool (6GB)
+        </text>
+        <text x="200" y="45" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#636e72">
+          Stable cache • Minimal evictions • Parallel processing
+        </text>
+      </g>
+      
+      <!-- Benefits -->
+      <g transform="translate(50, 160)">
+        <rect x="0" y="0" width="400" height="100" fill="#d5f4e6" stroke="#00b894" stroke-width="1" rx="3"/>
+        <text x="10" y="20" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#00853d">✅ Concurrency Benefits:</text>
+        <text x="10" y="35" font-family="Arial, sans-serif" font-size="11" fill="#2d3436">• Reduced buffer pool contention</text>
+        <text x="10" y="50" font-family="Arial, sans-serif" font-size="11" fill="#2d3436">• More dirty pages can be buffered</text>
+        <text x="10" y="65" font-family="Arial, sans-serif" font-size="11" fill="#2d3436">• Batch write operations</text>
+        <text x="10" y="80" font-family="Arial, sans-serif" font-size="11" fill="#2d3436">• Less frequent checkpoint flushes</text>
+      </g>
+    </g>
+  </g>
+  
+  <!-- Section 3: Read Performance Trade-off -->
+  <g transform="translate(50, 840)">
+    <rect x="0" y="0" width="1300" height="380" fill="white" stroke="#e1e8ed" stroke-width="2" rx="10"/>
+    <text x="20" y="30" font-family="Arial, sans-serif" font-size="20" font-weight="bold" fill="#2c3e50">
+      📉 Why Larger Buffer Pool Can Slow Down Reads
+    </text>
+    
+    <!-- Cache search comparison -->
+    <g transform="translate(50, 60)">
+      <text x="600" y="20" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#e17055">
+        Cache Search Performance Impact
+      </text>
+      
+      <!-- Small buffer search -->
+      <g transform="translate(50, 40)">
+        <rect x="0" y="0" width="250" height="120" fill="#f0f8ff" stroke="#74b9ff" stroke-width="2" rx="5"/>
+        <text x="125" y="20" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#0984e3">
+          128MB Buffer Search
+        </text>
+        
+        <!-- Hash table representation -->
+        <g transform="translate(20, 30)">
+          <rect x="0" y="0" width="15" height="15" fill="#74b9ff"/>
+          <rect x="20" y="0" width="15" height="15" fill="#74b9ff"/>
+          <rect x="40" y="0" width="15" height="15" fill="#74b9ff"/>
+          <rect x="60" y="0" width="15" height="15" fill="#fd79a8"/>
+          <rect x="80" y="0" width="15" height="15" fill="#74b9ff"/>
+          <text x="50" y="30" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#636e72">Small hash table</text>
+        </g>
+        
+        <text x="125" y="70" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#2d3436">
+          Fast hash lookups
+        </text>
+        <text x="125" y="85" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#2d3436">
+          ⚡ ~1-2 microseconds
+        </text>
+        <text x="125" y="100" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#2d3436">
+          Better CPU cache locality
+        </text>
+      </g>
+      
+      <!-- Large buffer search -->
+      <g transform="translate(350, 40)">
+        <rect x="0" y="0" width="250" height="120" fill="#fff0f5" stroke="#fd79a8" stroke-width="2" rx="5"/>
+        <text x="125" y="20" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#e84393">
+          6GB Buffer Search
+        </text>
+        
+        <!-- Large hash table representation -->
+        <g transform="translate(10, 30)">
+          <rect x="0" y="0" width="8" height="8" fill="#74b9ff"/>
+          <rect x="10" y="0" width="8" height="8" fill="#74b9ff"/>
+          <rect x="20" y="0" width="8" height="8" fill="#74b9ff"/>
+          <rect x="30" y="0" width="8" height="8" fill="#fd79a8"/>
+          <rect x="40" y="0" width="8" height="8" fill="#74b9ff"/>
+          <rect x="50" y="0" width="8" height="8" fill="#74b9ff"/>
+          <rect x="60" y="0" width="8" height="8" fill="#74b9ff"/>
+          <rect x="70" y="0" width="8" height="8" fill="#74b9ff"/>
+          <rect x="80" y="0" width="8" height="8" fill="#fd79a8"/>
+          <rect x="90" y="0" width="8" height="8" fill="#74b9ff"/>
+          <rect x="100" y="0" width="8" height="8" fill="#74b9ff"/>
+          <rect x="110" y="0" width="8" height="8" fill="#74b9ff"/>
+          <rect x="120" y="0" width="8" height="8" fill="#74b9ff"/>
+          <rect x="130" y="0" width="8" height="8" fill="#74b9ff"/>
+          <rect x="140" y="0" width="8" height="8" fill="#fd79a8"/>
+          <rect x="150" y="0" width="8" height="8" fill="#74b9ff"/>
+          <rect x="160" y="0" width="8" height="8" fill="#74b9ff"/>
+          <rect x="170" y="0" width="8" height="8" fill="#74b9ff"/>
+          <rect x="180" y="0" width="8" height="8" fill="#74b9ff"/>
+          <rect x="190" y="0" width="8" height="8" fill="#74b9ff"/>
+          <text x="100" y="25" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#636e72">Large hash table</text>
+        </g>
+        
+        <text x="125" y="70" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#2d3436">
+          Slower hash lookups
+        </text>
+        <text x="125" y="85" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#2d3436">
+          🐌 ~3-5 microseconds
+        </text>
+        <text x="125" y="100" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#2d3436">
+          More CPU cache misses
+        </text>
+      </g>
+      
+      <!-- Memory management overhead -->
+      <g transform="translate(650, 40)">
+        <rect x="0" y="0" width="250" height="120" fill="#ffeaa7" stroke="#fdcb6e" stroke-width="2" rx="5"/>
+        <text x="125" y="20" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#e17055">
+          Memory Management
+        </text>
+        
+        <text x="125" y="45" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#2d3436">
+          LRU list maintenance
+        </text>
+        <text x="125" y="60" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#2d3436">
+          Page replacement algorithms
+        </text>
+        <text x="125" y="75" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#2d3436">
+          Buffer pool instances
+        </text>
+        <text x="125" y="90" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#2d3436">
+          Mutex contention
+        </text>
+        <text x="125" y="105" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#2d3436">
+          Background thread overhead
+        </text>
+      </g>
+    </g>
+    
+    <!-- Performance comparison chart -->
+    <g transform="translate(50, 200)">
+      <text x="600" y="20" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#2c3e50">
+        Read Performance Comparison
+      </text>
+      
+      <!-- Chart background -->
+      <rect x="100" y="40" width="1000" height="120" fill="#f8f9fa" stroke="#dee2e6" stroke-width="1"/>
+      
+      <!-- Y-axis labels -->
+      <text x="90" y="55" text-anchor="end" font-family="Arial, sans-serif" font-size="10" fill="#636e72">Fast</text>
+      <text x="90" y="100" text-anchor="end" font-family="Arial, sans-serif" font-size="10" fill="#636e72">Medium</text>
+      <text x="90" y="145" text-anchor="end" font-family="Arial, sans-serif" font-size="10" fill="#636e72">Slow</text>
+      
+      <!-- X-axis labels -->
+      <text x="200" y="175" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#636e72">Single Query</text>
+      <text x="400" y="175" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#636e72">Low Concurrency</text>
+      <text x="600" y="175" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#636e72">Medium Concurrency</text>
+      <text x="800" y="175" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#636e72">High Concurrency</text>
+      <text x="1000" y="175" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#636e72">Very High Concurrency</text>
+      
+      <!-- 128MB line (red) -->
+      <path d="M 200 60 L 400 65 L 600 80 L 800 100 L 1000 130" stroke="#d63031" stroke-width="3" fill="none

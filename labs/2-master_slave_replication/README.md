@@ -35,7 +35,7 @@ This workshop demonstrates how to set up MySQL Master-Slave replication using Do
 ## 📁 Project Structure
 
 ```
-3-master_slave_replication/
+2-master_slave_replication/
 ├── docker-compose.yml          # Main Docker Compose configuration
 ├── config/
 │   ├── master.cnf              # MySQL master configuration
