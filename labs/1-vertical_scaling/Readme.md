@@ -14,6 +14,155 @@ This lab demonstrates **MySQL Vertical Scaling** through configuration optimizat
 
 This guide provides a comprehensive approach to test MySQL performance before and after configuration optimization on a MacBook Pro with 16GB RAM.
 
+## 🏗️ Architecture
+
+```mermaid
+graph TB
+    subgraph "MacBook Pro (16GB RAM)"
+        subgraph "Docker Environment"
+            subgraph "Phase 1: Baseline Testing"
+                A1["MySQL Default<br/>Port: 3306<br/>Config: default.cnf<br/>Buffer Pool: 128MB"]
+                B1["Performance Test Script<br/>./performance_test.sh before"]
+                C1["Results Collection<br/>performance_results/"]
+                
+                A1 --> B1
+                B1 --> C1
+            end
+            
+            subgraph "Phase 2: Optimized Testing"
+                A2["MySQL Optimized<br/>Port: 3307<br/>Config: optimized.cnf<br/>Buffer Pool: 6GB"]
+                B2["Performance Test Script<br/>./performance_test.sh after"]
+                C2["Results Collection<br/>performance_results/"]
+                
+                A2 --> B2
+                B2 --> C2
+            end
+            
+            subgraph "Analysis & Comparison"
+                D["Comparison Report<br/>./performance_test.sh compare"]
+                E["Performance Analysis<br/>Before vs After"]
+                
+                C1 --> D
+                C2 --> D
+                D --> E
+            end
+        end
+        
+        subgraph "Configuration Files"
+            F1["mysql/default.cnf<br/>Default MySQL Settings"]
+            F2["mysql/optimized.cnf<br/>Tuned for MacBook Pro"]
+            F3["docker-compose.yml<br/>Container Orchestration"]
+        end
+        
+        subgraph "System Resources"
+            G1["Memory: 16GB RAM<br/>Buffer Pool: 6GB<br/>OS: 6GB<br/>Other Apps: 4GB"]
+            G2["Storage: SSD<br/>Optimized I/O Settings"]
+            G3["CPU: 8-10 Cores<br/>Parallel Processing"]
+        end
+    end
+    
+    subgraph "Performance Metrics"
+        H1["INSERT Operations<br/>Records/Second"]
+        H2["SELECT Operations<br/>Query Time (ms)"]
+        H3["UPDATE Operations<br/>Records/Second"]
+        H4["System Metrics<br/>CPU, Memory, I/O"]
+    end
+    
+    E --> H1
+    E --> H2
+    E --> H3
+    E --> H4
+    
+    F1 --> A1
+    F2 --> A2
+    F3 --> A1
+    F3 --> A2
+    
+    G1 --> A1
+    G1 --> A2
+    G2 --> A1
+    G2 --> A2
+    G3 --> A1
+    G3 --> A2
+```
+
+### Testing Flow
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant Docker
+    participant MySQL_Default
+    participant MySQL_Optimized
+    participant TestScript
+    participant Results
+    
+    Note over User, Results: Phase 1: Baseline Testing
+    User->>Docker: docker-compose --profile default up -d mysql-default
+    Docker->>MySQL_Default: Start with default.cnf
+    MySQL_Default-->>Docker: Ready for connections
+    User->>TestScript: ./performance_test.sh before
+    TestScript->>MySQL_Default: Connect to port 3306
+    TestScript->>MySQL_Default: Run INSERT tests
+    TestScript->>MySQL_Default: Run SELECT tests
+    TestScript->>MySQL_Default: Run UPDATE tests
+    TestScript->>Results: Save baseline results
+    User->>Docker: docker-compose --profile default down
+    
+    Note over User, Results: Phase 2: Optimized Testing
+    User->>Docker: docker-compose --profile optimized up -d mysql-optimized
+    Docker->>MySQL_Optimized: Start with optimized.cnf
+    MySQL_Optimized-->>Docker: Ready for connections
+    User->>TestScript: ./performance_test.sh after
+    TestScript->>MySQL_Optimized: Connect to port 3307
+    TestScript->>MySQL_Optimized: Run same performance tests
+    TestScript->>Results: Save optimized results
+    
+    Note over User, Results: Analysis & Comparison
+    User->>TestScript: ./performance_test.sh compare
+    TestScript->>Results: Compare before vs after
+    TestScript->>User: Generate performance report
+```
+
+### Configuration Comparison
+
+```mermaid
+graph LR
+    subgraph "Default Configuration"
+        A1[innodb_buffer_pool_size<br/>128MB]
+        A2[max_connections<br/>151]
+        A3[innodb_io_capacity<br/>200]
+        A4[sort_buffer_size<br/>256KB]
+        A5[tmp_table_size<br/>16MB]
+    end
+    
+    subgraph "Optimized Configuration"
+        B1[innodb_buffer_pool_size<br/>6GB]
+        B2[max_connections<br/>200]
+        B3[innodb_io_capacity<br/>1000]
+        B4[sort_buffer_size<br/>1MB]
+        B5[tmp_table_size<br/>64MB]
+    end
+    
+    A1 -.->|47x Increase| B1
+    A2 -.->|32% Increase| B2
+    A3 -.->|5x Increase| B3
+    A4 -.->|4x Increase| B4
+    A5 -.->|4x Increase| B5
+    
+    style A1 fill:#ffcccc
+    style A2 fill:#ffcccc
+    style A3 fill:#ffcccc
+    style A4 fill:#ffcccc
+    style A5 fill:#ffcccc
+    
+    style B1 fill:#ccffcc
+    style B2 fill:#ccffcc
+    style B3 fill:#ccffcc
+    style B4 fill:#ccffcc
+    style B5 fill:#ccffcc
+```
+
 ## 🏗️ Setup Instructions
 
 ### 1. Directory Structure

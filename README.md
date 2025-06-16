@@ -20,4 +20,11 @@ MySQL Scaling Labs
   * [Testing Process](labs/3-master-active-active/quickguide.md#6-test-the-cluster)
   * [Troubleshooting](labs/3-master-active-active/quickguide.md#9-troubleshooting)
   * [Cluster Features](labs/3-master-active-active/quickguide.md#10-cluster-features)
+* [Lab 4: Database Sharding](labs/4-sharding/README.md)
+  * [Overview](labs/4-sharding/README.md#overview)
+  * [Setup Instructions](labs/4-sharding/README.md#setup-instructions)
+  * [Sharding Architecture](labs/4-sharding/README.md#sharding-architecture)
+  * [Testing Process](labs/4-sharding/README.md#testing-process)
+  * [Performance Analysis](labs/4-sharding/README.md#performance-analysis)
+  * [Troubleshooting](labs/4-sharding/README.md#troubleshooting)
 
