@@ -233,48 +233,9 @@ FROM orders o
     JOIN users u ON o.user_id = u.id
     JOIN order_items oi ON o.id = oi.order_id
     JOIN products p ON oi.product_id = p.id;
--- Create stored procedures for common operations
-DELIMITER // CREATE PROCEDURE GetUserOrders(IN user_id_param INT) BEGIN
-SELECT o.id,
-    o.order_number,
-    o.total_amount,
-    o.status,
-    o.created_at,
-    COUNT(oi.id) as item_count
-FROM orders o
-    LEFT JOIN order_items oi ON o.id = oi.order_id
-WHERE o.user_id = user_id_param
-GROUP BY o.id
-ORDER BY o.created_at DESC;
-END // CREATE PROCEDURE GetShardStats() BEGIN
-SELECT 'users' as table_name,
-    COUNT(*) as record_count
-FROM users
-UNION ALL
-SELECT 'orders' as table_name,
-    COUNT(*) as record_count
-FROM orders
-UNION ALL
-SELECT 'products' as table_name,
-    COUNT(*) as record_count
-FROM products
-UNION ALL
-SELECT 'order_items' as table_name,
-    COUNT(*) as record_count
-FROM order_items;
-END // DELIMITER;
--- Create triggers for data integrity
-DELIMITER // CREATE TRIGGER before_user_insert BEFORE
-INSERT ON users FOR EACH ROW BEGIN IF NEW.id < 1
-    OR NEW.id > 1000 THEN SIGNAL SQLSTATE '45000'
-SET MESSAGE_TEXT = 'User ID must be between 1 and 1000 for shard 1';
-END IF;
-END // CREATE TRIGGER before_order_insert BEFORE
-INSERT ON orders FOR EACH ROW BEGIN IF NEW.user_id < 1
-    OR NEW.user_id > 1000 THEN SIGNAL SQLSTATE '45000'
-SET MESSAGE_TEXT = 'User ID must be between 1 and 1000 for shard 1';
-END IF;
-END // DELIMITER;
+-- Create monitor user if it doesn't exist
+CREATE USER IF NOT EXISTS 'monitor' @'%' IDENTIFIED BY 'monitor_password';
+-- Load stored procedures and triggers
 -- Grant permissions
 GRANT ALL PRIVILEGES ON shard1.* TO 'shard_user' @'%';
 GRANT SELECT ON shard1.* TO 'monitor' @'%';
