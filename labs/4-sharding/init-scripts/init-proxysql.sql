@@ -1,5 +1,9 @@
 -- ProxySQL Sharding Router Initialization
 -- This script configures ProxySQL for sharding based on user ID
+-- Clean up existing configuration
+DELETE FROM mysql_servers;
+DELETE FROM mysql_users;
+DELETE FROM mysql_query_rules;
 -- Create monitor user
 INSERT INTO mysql_users (
         username,
