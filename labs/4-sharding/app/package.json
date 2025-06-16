@@ -1,0 +1,41 @@
+{
+    "name": "mysql-sharding-test",
+    "version": "1.0.0",
+    "description": "Database sharding test application with MariaDB Galera Cluster",
+    "main": "sharding-test.js",
+    "scripts": {
+        "start": "node sharding-test.js",
+        "test": "node test-basic-sharding.js",
+        "performance": "node test-performance.js",
+        "failover": "node test-failover.js",
+        "cross-shard": "node test-cross-shard.js",
+        "monitor": "node monitor-performance.js",
+        "check-distribution": "node check-data-distribution.js"
+    },
+    "keywords": [
+        "mysql",
+        "mariadb",
+        "galera",
+        "sharding",
+        "database",
+        "scaling",
+        "proxysql"
+    ],
+    "author": "Database Scaling Lab",
+    "license": "MIT",
+    "dependencies": {
+        "mysql2": "^3.6.5",
+        "express": "^4.18.2",
+        "cors": "^2.8.5",
+        "dotenv": "^16.3.1",
+        "chalk": "^4.1.2",
+        "cli-table3": "^0.6.3",
+        "moment": "^2.29.4"
+    },
+    "devDependencies": {
+        "nodemon": "^3.0.2"
+    },
+    "engines": {
+        "node": ">=16.0.0"
+    }
+}

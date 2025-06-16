@@ -1,0 +1,42 @@
+[mysqld]
+# Galera Provider Configuration
+wsrep_on=ON
+wsrep_provider=/usr/lib/galera/libgalera_smm.so
+wsrep_cluster_name=shard3_cluster
+wsrep_cluster_address=gcomm://shard3-node1,shard3-node2
+wsrep_node_name=shard3-node1
+wsrep_node_address=shard3-node1
+
+# SST Configuration (State Snapshot Transfer)
+wsrep_sst_method=rsync
+
+# Performance Settings
+wsrep_sync_wait=1
+wsrep_causal_reads=ON
+innodb_flush_log_at_trx_commit=0
+innodb_buffer_pool_size=122M
+
+# Connection Settings
+max_connections=1000
+thread_handling=pool-of-threads
+
+# Shard-specific settings
+server-id=3
+port=3306
+
+# Logging
+log_error=/var/log/mysql/error.log
+log_queries_not_using_indexes=ON
+slow_query_log=ON
+slow_query_log_file=/var/log/mysql/slow.log
+long_query_time=2
+
+# Replication settings
+binlog_format=ROW
+log_bin=/var/log/mysql/mysql-bin.log
+expire_logs_days=7
+max_binlog_size=100M
+
+# Galera specific
+wsrep_provider_options="gcache.size=300M; gcache.page_size=300M"
+wsrep_sst_auth=root:rootpassword 

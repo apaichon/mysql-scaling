@@ -1,0 +1,219 @@
+version: '3.8'
+
+services:
+  # Shard 1 - Primary Node
+  shard1-node1:
+    image: mariadb:10.11
+    container_name: shard1-node1
+    hostname: shard1-node1
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: shard1
+      MYSQL_USER: shard_user
+      MYSQL_PASSWORD: shard_password
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./init-scripts/init-shard1.sql:/docker-entrypoint-initdb.d/init-shard1.sql
+      - shard1_data1:/var/lib/mysql
+    networks:
+      - sharding_network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-prootpassword"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Shard 1 - Replica Node
+  shard1-node2:
+    image: mariadb:10.11
+    container_name: shard1-node2
+    hostname: shard1-node2
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: shard1
+      MYSQL_USER: shard_user
+      MYSQL_PASSWORD: shard_password
+    ports:
+      - "3308:3306"
+    volumes:
+      - shard1_data2:/var/lib/mysql
+    networks:
+      - sharding_network
+    depends_on:
+      shard1-node1:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-prootpassword"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Shard 2 - Primary Node
+  shard2-node1:
+    image: mariadb:10.11
+    container_name: shard2-node1
+    hostname: shard2-node1
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: shard2
+      MYSQL_USER: shard_user
+      MYSQL_PASSWORD: shard_password
+    ports:
+      - "3309:3306"
+    volumes:
+      - ./init-scripts/init-shard2.sql:/docker-entrypoint-initdb.d/init-shard2.sql
+      - shard2_data1:/var/lib/mysql
+    networks:
+      - sharding_network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-prootpassword"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Shard 2 - Replica Node
+  shard2-node2:
+    image: mariadb:10.11
+    container_name: shard2-node2
+    hostname: shard2-node2
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: shard2
+      MYSQL_USER: shard_user
+      MYSQL_PASSWORD: shard_password
+    ports:
+      - "3310:3306"
+    volumes:
+      - shard2_data2:/var/lib/mysql
+    networks:
+      - sharding_network
+    depends_on:
+      shard2-node1:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-prootpassword"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Shard 3 - Primary Node
+  shard3-node1:
+    image: mariadb:10.11
+    container_name: shard3-node1
+    hostname: shard3-node1
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: shard3
+      MYSQL_USER: shard_user
+      MYSQL_PASSWORD: shard_password
+    ports:
+      - "3311:3306"
+    volumes:
+      - ./init-scripts/init-shard3.sql:/docker-entrypoint-initdb.d/init-shard3.sql
+      - shard3_data1:/var/lib/mysql
+    networks:
+      - sharding_network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-prootpassword"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Shard 3 - Replica Node
+  shard3-node2:
+    image: mariadb:10.11
+    container_name: shard3-node2
+    hostname: shard3-node2
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: shard3
+      MYSQL_USER: shard_user
+      MYSQL_PASSWORD: shard_password
+    ports:
+      - "3312:3306"
+    volumes:
+      - shard3_data2:/var/lib/mysql
+    networks:
+      - sharding_network
+    depends_on:
+      shard3-node1:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-prootpassword"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Sharding Router (ProxySQL)
+  sharding-router:
+    image: proxysql/proxysql:2.4.4
+    container_name: sharding-router
+    hostname: sharding-router
+    ports:
+      - "3307:3306"
+      - "6032:6032"
+    volumes:
+      - ./config/proxysql-sharding.cnf:/etc/proxysql.cnf
+      - ./init-scripts/init-proxysql.sql:/docker-entrypoint-initdb.d/init-proxysql.sql
+    networks:
+      - sharding_network
+    depends_on:
+      - shard1-node1
+      - shard1-node2
+      - shard2-node1
+      - shard2-node2
+      - shard3-node1
+      - shard3-node2
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-P", "6032", "-u", "admin", "-padmin"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # phpMyAdmin for Management
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:5.2.1
+    container_name: sharding-phpmyadmin
+    hostname: sharding-phpmyadmin
+    environment:
+      PMA_HOST: sharding-router
+      PMA_PORT: 3306
+      PMA_USER: root
+      PMA_PASSWORD: rootpassword
+      MYSQL_ROOT_PASSWORD: rootpassword
+    ports:
+      - "8888:80"
+    networks:
+      - sharding_network
+    depends_on:
+      - sharding-router
+
+  # Monitoring Dashboard
+  monitoring:
+    image: nginx:alpine
+    container_name: sharding-monitoring
+    hostname: sharding-monitoring
+    ports:
+      - "3000:80"
+    volumes:
+      - ./monitoring:/usr/share/nginx/html
+    networks:
+      - sharding_network
+    depends_on:
+      - sharding-router
+
+volumes:
+  shard1_data1:
+  shard1_data2:
+  shard2_data1:
+  shard2_data2:
+  shard3_data1:
+  shard3_data2:
+
+networks:
+  sharding_network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.30.0.0/16 

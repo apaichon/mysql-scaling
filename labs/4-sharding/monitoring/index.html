@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MySQL Sharding Monitoring Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .card h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .status-online {
+            background-color: #4CAF50;
+            animation: pulse 2s infinite;
+        }
+
+        .status-offline {
+            background-color: #f44336;
+        }
+
+        .status-warning {
+            background-color: #ff9800;
+        }
+
+        @keyframes pulse {
+            0% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.5;
+            }
+
+            100% {
+                opacity: 1;
+            }
+        }
+
+        .metric {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .metric-label {
+            font-weight: 500;
+            color: #555;
+        }
+
+        .metric-value {
+            font-weight: bold;
+            color: #333;
+        }
+
+        .shard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+
+        .shard-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .shard-card h4 {
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+        }
+
+        .shard-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .stat-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 10px;
+            border-radius: 8px;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .performance-chart {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .chart-container {
+            height: 300px;
+            position: relative;
+        }
+
+        .refresh-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            margin-top: 20px;
+            transition: background 0.3s ease;
+        }
+
+        .refresh-btn:hover {
+            background: #5a6fd8;
+        }
+
+        .last-updated {
+            text-align: center;
+            color: #666;
+            margin-top: 20px;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .shard-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔧 MySQL Sharding Monitoring</h1>
+            <p>Real-time monitoring of MariaDB Galera Cluster with horizontal sharding</p>
+        </div>
+
+        <div class="dashboard-grid">
+            <!-- System Status -->
+            <div class="card">
+                <h3>🔄 System Status</h3>
+                <div class="metric">
+                    <span class="metric-label">Sharding Router</span>
+                    <span><span class="status-indicator status-online"></span>Online</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Shard 1 Cluster</span>
+                    <span><span class="status-indicator status-online"></span>Online</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Shard 2 Cluster</span>
+                    <span><span class="status-indicator status-online"></span>Online</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Shard 3 Cluster</span>
+                    <span><span class="status-indicator status-online"></span>Online</span>
+                </div>
+            </div>
+
+            <!-- Performance Metrics -->
+            <div class="card">
+                <h3>⚡ Performance Metrics</h3>
+                <div class="metric">
+                    <span class="metric-label">Average Query Time</span>
+                    <span class="metric-value" id="avg-query-time">-- ms</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Queries per Second</span>
+                    <span class="metric-value" id="qps">--</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Active Connections</span>
+                    <span class="metric-value" id="active-connections">--</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Error Rate</span>
+                    <span class="metric-value" id="error-rate">--%</span>
+                </div>
+            </div>
+
+            <!-- Sharding Distribution -->
+            <div class="card">
+                <h3>📊 Data Distribution</h3>
+                <div class="metric">
+                    <span class="metric-label">Shard 1 (Users 1-1000)</span>
+                    <span class="metric-value" id="shard1-count">-- users</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Shard 2 (Users 1001-2000)</span>
+                    <span class="metric-value" id="shard2-count">-- users</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Shard 3 (Users 2001-3000)</span>
+                    <span class="metric-value" id="shard3-count">-- users</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Total Users</span>
+                    <span class="metric-value" id="total-users">--</span>
+                </div>
+            </div>
+
+            <!-- Connection Pool -->
+            <div class="card">
+                <h3>🔗 Connection Pool Status</h3>
+                <div class="metric">
+                    <span class="metric-label">Router Pool</span>
+                    <span class="metric-value" id="router-pool">--/10</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Shard 1 Pool</span>
+                    <span class="metric-value" id="shard1-pool">--/5</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Shard 2 Pool</span>
+                    <span class="metric-value" id="shard2-pool">--/5</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Shard 3 Pool</span>
+                    <span class="metric-value" id="shard3-pool">--/5</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Shard Details -->
+        <div class="shard-grid">
+            <div class="shard-card">
+                <h4>Shard 1 (Primary)</h4>
+                <div class="shard-stats">
+                    <div class="stat-item">
+                        <span class="stat-value" id="shard1-users">--</span>
+                        <span class="stat-label">Users</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value" id="shard1-orders">--</span>
+                        <span class="stat-label">Orders</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="shard-card">
+                <h4>Shard 2 (Primary)</h4>
+                <div class="shard-stats">
+                    <div class="stat-item">
+                        <span class="stat-value" id="shard2-users">--</span>
+                        <span class="stat-label">Users</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value" id="shard2-orders">--</span>
+                        <span class="stat-label">Orders</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="shard-card">
+                <h4>Shard 3 (Primary)</h4>
+                <div class="shard-stats">
+                    <div class="stat-item">
+                        <span class="stat-value" id="shard3-users">--</span>
+                        <span class="stat-label">Users</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value" id="shard3-orders">--</span>
+                        <span class="stat-label">Orders</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Performance Chart -->
+        <div class="performance-chart">
+            <h3>📈 Query Performance Over Time</h3>
+            <div class="chart-container">
+                <canvas id="performanceChart"></canvas>
+            </div>
+        </div>
+
+        <div style="text-align: center; margin-top: 20px;">
+            <button class="refresh-btn" onclick="refreshData()">🔄 Refresh Data</button>
+        </div>
+
+        <div class="last-updated">
+            Last updated: <span id="last-updated">--</span>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Mock data for demonstration
+        let performanceData = {
+            labels: [],
+            datasets: [{
+                label: 'Query Time (ms)',
+                data: [],
+                borderColor: '#667eea',
+                backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                tension: 0.4
+            }]
+        };
+
+        let performanceChart;
+
+        // Initialize the chart
+        function initChart() {
+            const ctx = document.getElementById('performanceChart').getContext('2d');
+            performanceChart = new Chart(ctx, {
+                type: 'line',
+                data: performanceData,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Query Time (ms)'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Time'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top'
+                        }
+                    }
+                }
+            });
+        }
+
+        // Update dashboard with mock data
+        function updateDashboard() {
+            // System status (mock)
+            document.getElementById('avg-query-time').textContent = Math.floor(Math.random() * 50 + 10) + ' ms';
+            document.getElementById('qps').textContent = Math.floor(Math.random() * 100 + 50);
+            document.getElementById('active-connections').textContent = Math.floor(Math.random() * 20 + 5);
+            document.getElementById('error-rate').textContent = (Math.random() * 2).toFixed(2) + '%';
+
+            // Data distribution (mock)
+            document.getElementById('shard1-count').textContent = Math.floor(Math.random() * 50 + 10) + ' users';
+            document.getElementById('shard2-count').textContent = Math.floor(Math.random() * 50 + 10) + ' users';
+            document.getElementById('shard3-count').textContent = Math.floor(Math.random() * 50 + 10) + ' users';
+            document.getElementById('total-users').textContent = Math.floor(Math.random() * 150 + 30);
+
+            // Connection pools (mock)
+            document.getElementById('router-pool').textContent = Math.floor(Math.random() * 5 + 3) + '/10';
+            document.getElementById('shard1-pool').textContent = Math.floor(Math.random() * 3 + 2) + '/5';
+            document.getElementById('shard2-pool').textContent = Math.floor(Math.random() * 3 + 2) + '/5';
+            document.getElementById('shard3-pool').textContent = Math.floor(Math.random() * 3 + 2) + '/5';
+
+            // Shard details (mock)
+            document.getElementById('shard1-users').textContent = Math.floor(Math.random() * 50 + 10);
+            document.getElementById('shard1-orders').textContent = Math.floor(Math.random() * 20 + 5);
+            document.getElementById('shard2-users').textContent = Math.floor(Math.random() * 50 + 10);
+            document.getElementById('shard2-orders').textContent = Math.floor(Math.random() * 20 + 5);
+            document.getElementById('shard3-users').textContent = Math.floor(Math.random() * 50 + 10);
+            document.getElementById('shard3-orders').textContent = Math.floor(Math.random() * 20 + 5);
+
+            // Update performance chart
+            const now = new Date();
+            const timeString = now.toLocaleTimeString();
+
+            performanceData.labels.push(timeString);
+            performanceData.datasets[0].data.push(Math.floor(Math.random() * 50 + 10));
+
+            // Keep only last 20 data points
+            if (performanceData.labels.length > 20) {
+                performanceData.labels.shift();
+                performanceData.datasets[0].data.shift();
+            }
+
+            performanceChart.update();
+
+            // Update last updated time
+            document.getElementById('last-updated').textContent = now.toLocaleString();
+        }
+
+        // Refresh data function
+        function refreshData() {
+            updateDashboard();
+        }
+
+        // Initialize dashboard
+        document.addEventListener('DOMContentLoaded', function () {
+            initChart();
+            updateDashboard();
+
+            // Update every 5 seconds
+            setInterval(updateDashboard, 5000);
+        });
+    </script>
+</body>
+
+</html>
