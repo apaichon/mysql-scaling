@@ -9,9 +9,9 @@ log-slave-updates = 1
 # Read-only mode for slaves (will be set during setup)
 read-only = 0
 
-# GTID-based replication
-gtid-mode = ON
-enforce-gtid-consistency = ON
+# Disable GTID for traditional replication (simpler for lab)
+# gtid-mode = ON
+# enforce-gtid-consistency = ON
 
 # Replication settings
 relay_log_recovery = 1
@@ -25,6 +25,9 @@ innodb_buffer_pool_size = 256M
 # Character set
 character-set-server = utf8mb4
 collation-server = utf8mb4_unicode_ci
+
+# Authentication
+default_authentication_plugin = mysql_native_password
 
 # Logging
 general_log = 1

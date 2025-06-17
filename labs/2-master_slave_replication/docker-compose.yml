@@ -18,7 +18,7 @@ services:
       - ./init-scripts:/docker-entrypoint-initdb.d
     networks:
       - mysql-replication
-    command: --server-id=1 --log-bin=mysql-bin --binlog-do-db=testdb
+    command: --server-id=1 --log-bin=mysql-bin --binlog-do-db=testdb --default-authentication-plugin=mysql_native_password
 
   mysql-slave1:
     image: mysql:8.0
@@ -36,7 +36,7 @@ services:
       - mysql-replication
     depends_on:
       - mysql-master
-    command: --server-id=2 --relay-log=mysql-relay-bin --log-slave-updates=1
+    command: --server-id=2 --relay-log=mysql-relay-bin --log-slave-updates=1 --default-authentication-plugin=mysql_native_password
 
   mysql-slave2:
     image: mysql:8.0
@@ -54,7 +54,7 @@ services:
       - mysql-replication
     depends_on:
       - mysql-master
-    command: --server-id=3 --relay-log=mysql-relay-bin --log-slave-updates=1
+    command: --server-id=3 --relay-log=mysql-relay-bin --log-slave-updates=1 --default-authentication-plugin=mysql_native_password
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin

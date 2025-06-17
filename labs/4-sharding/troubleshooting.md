@@ -53,3 +53,47 @@ docker exec -it sharding-router mysql -h127.0.0.1 -P6032 -uadmin -padmin -e "SEL
 ```bash
 docker exec -it sharding-router mysql -h127.0.0.1 -P3306 -uroot -prootpassword -e "SELECT 1;"
 ```
+
+
+docker exec -it shard1-node1 mysql -uroot -prootpassword -e "SELECT * FROM shard1.users;"
+
+docker exec -it shard2-node1 mysql -uroot -prootpassword -e "SELECT * FROM shard2.users;"
+
+docker exec -it shard3-node1 mysql -uroot -prootpassword -e "SELECT * FROM shard3.users;"
+
+docker exec -it sharding-router mysql -h127.0.0.1 -P3306 -uroot -prootpassword -e "SELECT * FROM users;"
+
+
+docker exec -it sharding-router mysql -h127.0.0.1 -P3306 -uroot -prootpassword -e \
+"SELECT 'shard1' as shard_name, * FROM shard1.users \
+UNION ALL \
+SELECT 'shard2' as shard_name, * FROM shard2.users \
+UNION ALL \
+SELECT 'shard3' as shard_name, * FROM shard3.users \
+ORDER BY id;"
+
+docker exec -it sharding-router mysql -h127.0.0.1 -P3306 -uroot -prootpassword -e "SELECT * FROM users;"
+docker exec -it sharding-router mysql -h127.0.0.1 -P3307 -uroot -prootpassword -e "SELECT * FROM users;"
+
+docker exec -it sharding-router mysql -h127.0.0.1 -P3306 -uroot -prootpassword -e \
+"SELECT 'shard1' as shard_name, * FROM shard1.users \
+WHERE id BETWEEN 1 AND 1000 \
+UNION ALL \
+SELECT 'shard2' as shard_name, * FROM shard2.users \
+WHERE id BETWEEN 1001 AND 2000 \
+UNION ALL \
+SELECT 'shard3' as shard_name, * FROM shard3.users \
+WHERE id BETWEEN 2001 AND 3000 \
+ORDER BY id;"
+
+
+docker exec -it sharding-router mysql -h127.0.0.1 -P6032 -uadmin -padmin -e \
+"SELECT * \
+FROM mysql_servers \
+LEFT JOIN stats.stats_memory_metrics ON hostname=hostname \
+ORDER BY hostgroup_id, hostname;"
+
+
+docker exec -it sharding-router mysql -h127.0.0.1 -P3306 -uroot -prootpassword -e \
+"SELECT 'shard2' as shard_name, * FROM users \
+WHERE id BETWEEN 1001 AND 2000 "

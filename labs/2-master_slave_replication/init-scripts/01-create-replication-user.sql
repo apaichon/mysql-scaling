@@ -7,6 +7,8 @@ GRANT SELECT,
     INSERT,
     UPDATE,
     DELETE ON testdb.* TO 'appuser' @'%';
+-- Also update root user to use mysql_native_password for consistency
+ALTER USER 'root' @'localhost' IDENTIFIED WITH mysql_native_password BY 'masterpassword';
 -- Flush privileges to ensure changes take effect
 FLUSH PRIVILEGES;
 -- Show master status for reference

@@ -7,9 +7,9 @@ log-bin = mysql-bin
 binlog-format = ROW
 binlog-do-db = testdb
 
-# GTID-based replication (recommended for MySQL 8.0)
-gtid-mode = ON
-enforce-gtid-consistency = ON
+# Disable GTID for traditional replication (simpler for lab)
+# gtid-mode = ON
+# enforce-gtid-consistency = ON
 
 # Replication settings
 sync_binlog = 1
@@ -22,6 +22,9 @@ innodb_buffer_pool_size = 256M
 # Character set
 character-set-server = utf8mb4
 collation-server = utf8mb4_unicode_ci
+
+# Authentication
+default_authentication_plugin = mysql_native_password
 
 # Logging
 general_log = 1
