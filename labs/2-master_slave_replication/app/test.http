@@ -1,0 +1,384 @@
+### MySQL Replication API Tests
+### Base URL: http://localhost:3000
+
+### ========================================
+### 1. HEALTH CHECK ENDPOINTS
+### ========================================
+
+### Check overall system health
+GET http://localhost:3000/health
+Content-Type: application/json
+
+###
+
+### ========================================
+### 2. READ OPERATIONS (Routed to Slaves)
+### ========================================
+
+### Get all users (randomly routed to slave1 or slave2)
+GET http://localhost:3000/api/users
+Content-Type: application/json
+
+###
+
+### Get user by ID (randomly routed to slave1 or slave2)
+GET http://localhost:3000/api/users/1
+Content-Type: application/json
+
+###
+
+### Get non-existent user (should return 404)
+GET http://localhost:3000/api/users/999
+Content-Type: application/json
+
+###
+
+### ========================================
+### 3. WRITE OPERATIONS (Routed to Master)
+### ========================================
+
+### Create a new user (routed to master)
+POST http://localhost:3000/api/users
+Content-Type: application/json
+
+{
+    "username": "testuser1",
+    "email": "test1@example.com",
+    "first_name": "Test",
+    "last_name": "User"
+}
+
+###
+
+### Create another user
+POST http://localhost:3000/api/users
+Content-Type: application/json
+
+{
+    "username": "testuser2",
+    "email": "test2@example.com",
+    "first_name": "John",
+    "last_name": "Doe"
+}
+
+###
+
+### Create user with missing required fields (should return 400)
+POST http://localhost:3000/api/users
+Content-Type: application/json
+
+{
+    "username": "incomplete_user"
+}
+
+###
+
+### Update user (routed to master)
+PUT http://localhost:3000/api/users/1
+Content-Type: application/json
+
+{
+    "username": "updated_user",
+    "email": "updated@example.com",
+    "first_name": "Updated",
+    "last_name": "Name"
+}
+
+###
+
+### Update non-existent user (should return 404)
+PUT http://localhost:3000/api/users/999
+Content-Type: application/json
+
+{
+    "username": "nonexistent",
+    "email": "nonexistent@example.com",
+    "first_name": "Non",
+    "last_name": "Existent"
+}
+
+###
+
+### Delete user (routed to master)
+DELETE http://localhost:3000/api/users/2
+Content-Type: application/json
+
+###
+
+### Delete non-existent user (should return 404)
+DELETE http://localhost:3000/api/users/999
+Content-Type: application/json
+
+###
+
+### ========================================
+### 4. CUSTOM QUERY ENDPOINT
+### ========================================
+
+### Custom SELECT query (routed to random slave)
+POST http://localhost:3000/api/query
+Content-Type: application/json
+
+{
+    "query": "SELECT COUNT(*) as user_count FROM users",
+    "operation": "read"
+}
+
+###
+
+### Custom SELECT with parameters (routed to random slave)
+POST http://localhost:3000/api/query
+Content-Type: application/json
+
+{
+    "query": "SELECT * FROM users WHERE email LIKE ?",
+    "params": ["%@example.com"],
+    "operation": "read"
+}
+
+###
+
+### Custom INSERT query (routed to master)
+POST http://localhost:3000/api/query
+Content-Type: application/json
+
+{
+    "query": "INSERT INTO users (username, email, first_name, last_name) VALUES (?, ?, ?, ?)",
+    "params": ["custom_user", "custom@example.com", "Custom", "User"],
+    "operation": "write"
+}
+
+###
+
+### Custom UPDATE query (routed to master)
+POST http://localhost:3000/api/query
+Content-Type: application/json
+
+{
+    "query": "UPDATE users SET last_name = ? WHERE username = ?",
+    "params": ["Modified", "custom_user"],
+    "operation": "write"
+}
+
+###
+
+### Custom DELETE query (routed to master)
+POST http://localhost:3000/api/query
+Content-Type: application/json
+
+{
+    "query": "DELETE FROM users WHERE username = ?",
+    "params": ["custom_user"],
+    "operation": "write"
+}
+
+###
+
+### Query without parameters (should return 400)
+POST http://localhost:3000/api/query
+Content-Type: application/json
+
+{
+    "operation": "read"
+}
+
+###
+
+### ========================================
+### 5. REPLICATION TESTING SEQUENCE
+### ========================================
+
+### Step 1: Check initial health
+GET http://localhost:3000/health
+
+###
+
+### Step 2: Get initial user count
+POST http://localhost:3000/api/query
+Content-Type: application/json
+
+{
+    "query": "SELECT COUNT(*) as initial_count FROM users"
+}
+
+###
+
+### Step 3: Create test user for replication test
+POST http://localhost:3000/api/users
+Content-Type: application/json
+
+{
+    "username": "replication_test",
+    "email": "replication@test.com",
+    "first_name": "Replication",
+    "last_name": "Test"
+}
+
+###
+
+### Step 4: Verify user was created (check multiple times to see slave routing)
+GET http://localhost:3000/api/users
+Content-Type: application/json
+
+###
+
+### Step 5: Get the created user by ID (use ID 1 or check response from step 3)
+GET http://localhost:3000/api/users/1
+Content-Type: application/json
+
+###
+
+### Step 6: Update the user
+PUT http://localhost:3000/api/users/1
+Content-Type: application/json
+
+{
+    "username": "replication_test_updated",
+    "email": "replication.updated@test.com",
+    "first_name": "Replication",
+    "last_name": "Updated"
+}
+
+###
+
+### Step 7: Verify update propagated to slaves
+GET http://localhost:3000/api/users/1
+Content-Type: application/json
+
+###
+
+### Step 8: Delete the test user
+DELETE http://localhost:3000/api/users/1
+Content-Type: application/json
+
+###
+
+### Step 9: Verify deletion propagated to slaves
+GET http://localhost:3000/api/users/1
+Content-Type: application/json
+
+###
+
+### ========================================
+### 6. ERROR HANDLING TESTS
+### ========================================
+
+### Test invalid endpoint (should return 404)
+GET http://localhost:3000/api/nonexistent
+Content-Type: application/json
+
+###
+
+### Test malformed JSON (should return 400)
+POST http://localhost:3000/api/users
+Content-Type: application/json
+
+{
+    "username": "test",
+    "email": "test@example.com",
+    "first_name": "Test",
+    "last_name": "User",
+    "invalid_field": "this should cause an error"
+}
+
+###
+
+### Test SQL injection attempt (should be handled safely)
+POST http://localhost:3000/api/query
+Content-Type: application/json
+
+{
+    "query": "SELECT * FROM users WHERE username = 'admin' OR '1'='1'",
+    "operation": "read"
+}
+
+###
+
+### ========================================
+### 7. PERFORMANCE TESTING
+### ========================================
+
+### Test multiple concurrent reads (should route to different slaves)
+GET http://localhost:3000/api/users
+
+###
+
+GET http://localhost:3000/api/users
+
+###
+
+GET http://localhost:3000/api/users
+
+###
+
+### Test read after write (should show replication lag if any)
+POST http://localhost:3000/api/users
+Content-Type: application/json
+
+{
+    "username": "performance_test",
+    "email": "perf@test.com",
+    "first_name": "Performance",
+    "last_name": "Test"
+}
+
+###
+
+GET http://localhost:3000/api/users
+Content-Type: application/json
+
+###
+
+### ========================================
+### 8. BULK OPERATIONS TESTING
+### ========================================
+
+### Bulk insert test
+POST http://localhost:3000/api/query
+Content-Type: application/json
+
+{
+    "query": "INSERT INTO users (username, email, first_name, last_name) VALUES (?, ?, ?, ?), (?, ?, ?, ?), (?, ?, ?, ?)",
+    "params": [
+        "bulk_user1", "bulk1@test.com", "Bulk", "User1",
+        "bulk_user2", "bulk2@test.com", "Bulk", "User2", 
+        "bulk_user3", "bulk3@test.com", "Bulk", "User3"
+    ],
+    "operation": "write"
+}
+
+###
+
+### Bulk select test
+POST http://localhost:3000/api/query
+Content-Type: application/json
+
+{
+    "query": "SELECT * FROM users WHERE username LIKE 'bulk_%' ORDER BY id DESC LIMIT 10"
+}
+
+###
+
+### ========================================
+### 9. FINAL VERIFICATION
+### ========================================
+
+### Final health check
+GET http://localhost:3000/health
+
+###
+
+### Final user count
+POST http://localhost:3000/api/query
+Content-Type: application/json
+
+{
+    "query": "SELECT COUNT(*) as final_count FROM users"
+}
+
+###
+
+### Get all users for final verification
+GET http://localhost:3000/api/users
+
+###
